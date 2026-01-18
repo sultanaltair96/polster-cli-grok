@@ -57,7 +57,7 @@ pip install -e ".[dev]"
 ```
 
 **Requirements:**
-- Python 3.13+
+- Python 3.12+
 - Internet connection for initial setup
 
 ## ⚡ Quick Start (5 minutes)
@@ -228,7 +228,7 @@ ruff check .
 - Code contributions: Pull Requests
 
 **Development Guidelines:**
-- Python 3.13+ required
+- Python 3.12+ required
 - Tests required for new features
 - Ruff for code formatting
 - Comprehensive documentation
