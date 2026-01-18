@@ -1,1 +1,0 @@
-"""Silver assets package initialization."""
