@@ -6,7 +6,7 @@ import shutil
 import subprocess
 import sys
 from pathlib import Path
-from typing import Any, Dict
+from typing import Any
 
 import typer
 from rich import print as rprint
@@ -34,7 +34,9 @@ def validate_asset_name(name: str) -> str:
     return name
 
 
-def copy_template_file(src: Path, dest: Path, replacements: Dict[str, str] | None = None) -> None:
+def copy_template_file(
+    src: Path, dest: Path, replacements: dict[str, str] | None = None
+) -> None:
     """Copy template file with optional string replacements."""
     dest.parent.mkdir(parents=True, exist_ok=True)
 
@@ -53,7 +55,10 @@ def ensure_polster_project() -> Path:
     cwd = Path.cwd()
 
     # Look for src/core and src/orchestration directories
-    if not (cwd / "src" / "core").exists() or not (cwd / "src" / "orchestration").exists():
+    if (
+        not (cwd / "src" / "core").exists()
+        or not (cwd / "src" / "orchestration").exists()
+    ):
         rprint("[red]Error: Not in a valid Polster project directory.[/red]")
         rprint("Make sure you're in a directory created with 'polster init <name>'.")
         raise typer.Exit(1)
@@ -78,11 +83,12 @@ def run_command(cmd: list[str], cwd: Path | None = None) -> bool:
 def _find_available_port(start_port: int = 3000) -> int:
     """Find an available port starting from start_port."""
     import socket
+
     port = start_port
     while port < start_port + 100:  # Try up to 100 ports
         try:
             with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
-                s.bind(('', port))
+                s.bind(("", port))
                 return port
         except OSError:
             port += 1
@@ -113,7 +119,9 @@ def _start_dagster_ui(project_path: Path) -> None:
             venv_python = Path(".venv/Scripts/python.exe")
 
     if venv_python is None:
-        rprint("[red]❌ Virtual environment Python not found. Please run the following manually:[/red]")
+        rprint(
+            "[red]❌ Virtual environment Python not found. Please run the following manually:[/red]"
+        )
         rprint(f"  cd {project_path.name}")
         rprint("  source .venv/bin/activate")
         rprint("  dagster dev")
@@ -149,10 +157,18 @@ def init(
     project_name: str,
     git: bool = typer.Option(False, "--git", help="Initialize git repository"),
     no_git: bool = typer.Option(False, "--no-git", help="Skip git initialization"),
-    sample_assets: bool = typer.Option(True, "--sample-assets/--no-sample-assets", help="Create sample stub assets"),
-    install_uv: bool = typer.Option(True, "--install-uv/--no-install-uv", help="Install uv if missing"),
-    dry_run: bool = typer.Option(False, "--dry-run", help="Show what would be created without creating"),
-    start_dagster: bool = typer.Option(False, "--start-dagster", help="Start Dagster UI after project creation"),
+    sample_assets: bool = typer.Option(
+        True, "--sample-assets/--no-sample-assets", help="Create sample stub assets"
+    ),
+    install_uv: bool = typer.Option(
+        True, "--install-uv/--no-install-uv", help="Install uv if missing"
+    ),
+    dry_run: bool = typer.Option(
+        False, "--dry-run", help="Show what would be created without creating"
+    ),
+    start_dagster: bool = typer.Option(
+        False, "--start-dagster", help="Start Dagster UI after project creation"
+    ),
 ) -> None:
     """Initialize a new Polster project."""
     rprint(f"[bold]Creating new Polster project: {project_name}[/bold]")
@@ -230,7 +246,9 @@ def init(
         if run_command(["sh", "-c", "curl -LsSf https://astral.sh/uv/install.sh | sh"]):
             rprint("[green]✓[/green] Installed uv")
             # Need to update PATH for subprocess to see uv
-            os.environ["PATH"] = os.path.expanduser("~/.cargo/bin:") + os.environ.get("PATH", "")
+            os.environ["PATH"] = os.path.expanduser("~/.cargo/bin:") + os.environ.get(
+                "PATH", ""
+            )
             if not shutil.which("uv"):
                 # Try common installation locations
                 uv_paths = [
@@ -239,7 +257,9 @@ def init(
                 ]
                 for uv_path in uv_paths:
                     if uv_path.exists():
-                        os.environ["PATH"] = f"{uv_path.parent}:" + os.environ.get("PATH", "")
+                        os.environ["PATH"] = f"{uv_path.parent}:" + os.environ.get(
+                            "PATH", ""
+                        )
                         break
         else:
             rprint("[yellow]⚠[/yellow] uv installation failed")
@@ -255,7 +275,9 @@ def init(
                 # Try uv sync first, then fall back to uv pip install
                 if run_command(["uv", "sync", "--extra", "dev"], cwd=project_path):
                     rprint("[green]✓[/green] Installed dependencies with uv sync")
-                elif run_command(["uv", "pip", "install", "-e", ".[dev]"], cwd=project_path):
+                elif run_command(
+                    ["uv", "pip", "install", "-e", ".[dev]"], cwd=project_path
+                ):
                     rprint("[green]✓[/green] Installed dependencies with uv pip")
                 else:
                     rprint("[yellow]⚠[/yellow] Failed to install dependencies with uv")
@@ -267,7 +289,11 @@ def init(
                 rprint("[green]✓[/green] Created virtual environment")
 
                 # Install dependencies
-                pip_cmd = [".venv/bin/pip"] if os.name != "nt" else [".venv\\Scripts\\pip.exe"]
+                pip_cmd = (
+                    [".venv/bin/pip"]
+                    if os.name != "nt"
+                    else [".venv\\Scripts\\pip.exe"]
+                )
                 if run_command(pip_cmd + ["install", "-e", ".[dev]"], cwd=project_path):
                     rprint("[green]✓[/green] Installed dependencies")
                 else:
@@ -281,9 +307,13 @@ def init(
         rprint(f"\nTo get started:")
         rprint(f"  cd {project_name}")
         if shutil.which("uv"):
-            rprint("  source .venv/bin/activate  # or '.venv\\Scripts\\activate' on Windows")
+            rprint(
+                "  source .venv/bin/activate  # or '.venv\\Scripts\\activate' on Windows"
+            )
         else:
-            rprint("  source .venv/bin/activate  # or '.venv\\Scripts\\activate' on Windows")
+            rprint(
+                "  source .venv/bin/activate  # or '.venv\\Scripts\\activate' on Windows"
+            )
         rprint("  dagster dev  # Start Dagster UI")
         rprint("\nTo add new assets:")
         rprint("  polster add-asset")
@@ -297,7 +327,9 @@ def init(
 def add_asset(
     layer: str = typer.Option(None, "--layer", help="Layer (bronze/silver/gold)"),
     name: str = typer.Option(None, "--name", help="Asset name (lowercase snake_case)"),
-    dry_run: bool = typer.Option(False, "--dry-run", help="Preview files without creating"),
+    dry_run: bool = typer.Option(
+        False, "--dry-run", help="Preview files without creating"
+    ),
 ) -> None:
     """Add a new asset to the current Polster project."""
     # Ensure we're in a valid project
@@ -327,7 +359,14 @@ def add_asset(
 
     # Define file paths
     core_file = project_path / "src" / "core" / f"{layer}_{asset_name}.py"
-    orch_file = project_path / "src" / "orchestration" / "assets" / layer / f"run_{layer}_{asset_name}.py"
+    orch_file = (
+        project_path
+        / "src"
+        / "orchestration"
+        / "assets"
+        / layer
+        / f"run_{layer}_{asset_name}.py"
+    )
 
     # Check if files already exist
     if core_file.exists() or orch_file.exists():
@@ -356,13 +395,17 @@ def add_asset(
     copy_template_file(orch_template, orch_file, replacements)
 
     rprint(f"[green]✓[/green] Created core file: {core_file.relative_to(project_path)}")
-    rprint(f"[green]✓[/green] Created orchestration file: {orch_file.relative_to(project_path)}")
+    rprint(
+        f"[green]✓[/green] Created orchestration file: {orch_file.relative_to(project_path)}"
+    )
 
     rprint("\n[bold]Next steps:[/bold]")
     rprint("1. Edit the core file to implement your logic")
     rprint("2. Uncomment the example code to test")
     rprint("3. Run 'dagster dev' to see your asset in the UI")
-    rprint(f"4. Materialize: 'dagster asset materialize --select run_{layer}_{asset_name}'")
+    rprint(
+        f"4. Materialize: 'dagster asset materialize --select run_{layer}_{asset_name}'"
+    )
 
 
 if __name__ == "__main__":
