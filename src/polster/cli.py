@@ -104,12 +104,13 @@ def _start_dagster_ui(project_path: Path) -> None:
     # Try Unix-style path first
     candidate = project_path / ".venv" / "bin" / "python"
     if candidate.exists():
-        venv_python = candidate
+        # Since we'll be in the project directory, use relative path
+        venv_python = Path(".venv/bin/python")
     else:
         # Try Windows-style path
         candidate = project_path / ".venv" / "Scripts" / "python.exe"
         if candidate.exists():
-            venv_python = candidate
+            venv_python = Path(".venv/Scripts/python.exe")
 
     if venv_python is None:
         rprint("[red]❌ Virtual environment Python not found. Please run the following manually:[/red]")
@@ -125,7 +126,8 @@ def _start_dagster_ui(project_path: Path) -> None:
 
     try:
         # Start Dagster using the project's virtual environment
-        cmd = [str(venv_python), str(project_path / "run_dagster.py"), "dev", "--port", str(port)]
+        # Since we're already in the project directory, just use "run_dagster.py"
+        cmd = [str(venv_python), "run_dagster.py", "dev", "--port", str(port)]
         rprint(f"[dim]Running: {' '.join(cmd)}[/dim]")
 
         subprocess.run(cmd)
@@ -250,11 +252,13 @@ def init(
             if run_command(["uv", "venv"], cwd=project_path):
                 rprint("[green]✓[/green] Created virtual environment with uv")
 
-                # Install dependencies
-                if run_command(["uv", "pip", "install", "-e", ".[dev]"], cwd=project_path):
-                    rprint("[green]✓[/green] Installed dependencies")
+                # Try uv sync first, then fall back to uv pip install
+                if run_command(["uv", "sync", "--extra", "dev"], cwd=project_path):
+                    rprint("[green]✓[/green] Installed dependencies with uv sync")
+                elif run_command(["uv", "pip", "install", "-e", ".[dev]"], cwd=project_path):
+                    rprint("[green]✓[/green] Installed dependencies with uv pip")
                 else:
-                    rprint("[yellow]⚠[/yellow] Failed to install dependencies")
+                    rprint("[yellow]⚠[/yellow] Failed to install dependencies with uv")
             else:
                 rprint("[yellow]⚠[/yellow] Failed to create virtual environment")
         else:
