@@ -75,6 +75,73 @@ def run_command(cmd: list[str], cwd: Path | None = None) -> bool:
         return False
 
 
+def _find_available_port(start_port: int = 3000) -> int:
+    """Find an available port starting from start_port."""
+    import socket
+    port = start_port
+    while port < start_port + 100:  # Try up to 100 ports
+        try:
+            with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+                s.bind(('', port))
+                return port
+        except OSError:
+            port += 1
+    return start_port  # Fallback to start_port even if potentially taken
+
+
+def _start_dagster_ui(project_path: Path) -> None:
+    """Start Dagster UI in the project directory."""
+    port = _find_available_port(3000)
+
+    rprint(f"[green]✓[/green] Starting Dagster UI on port {port}...")
+    rprint(f"[blue]🚀[/blue] Dagster UI will be available at: http://localhost:{port}")
+    rprint("[dim]Press Ctrl+C to stop...[/dim]")
+    rprint()
+
+    # Check if virtual environment exists and find python executable
+    venv_python = None
+
+    # Try Unix-style path first
+    candidate = project_path / ".venv" / "bin" / "python"
+    if candidate.exists():
+        venv_python = candidate
+    else:
+        # Try Windows-style path
+        candidate = project_path / ".venv" / "Scripts" / "python.exe"
+        if candidate.exists():
+            venv_python = candidate
+
+    if venv_python is None:
+        rprint("[red]❌ Virtual environment Python not found. Please run the following manually:[/red]")
+        rprint(f"  cd {project_path.name}")
+        rprint("  source .venv/bin/activate")
+        rprint("  dagster dev")
+        return
+        return
+
+    # Change to project directory
+    original_cwd = os.getcwd()
+    os.chdir(project_path)
+
+    try:
+        # Start Dagster using the project's virtual environment
+        cmd = [str(venv_python), str(project_path / "run_dagster.py"), "dev", "--port", str(port)]
+        rprint(f"[dim]Running: {' '.join(cmd)}[/dim]")
+
+        subprocess.run(cmd)
+    except KeyboardInterrupt:
+        rprint("[yellow]⚠[/yellow] Dagster UI stopped")
+    except Exception as e:
+        rprint(f"[red]❌ Failed to start Dagster: {e}[/red]")
+        rprint("[dim]You can start it manually with:[/dim]")
+        rprint(f"  cd {project_path.name}")
+        rprint("  source .venv/bin/activate")
+        rprint("  dagster dev")
+    finally:
+        # Restore original directory
+        os.chdir(original_cwd)
+
+
 @app.command()
 def init(
     project_name: str,
@@ -83,6 +150,7 @@ def init(
     sample_assets: bool = typer.Option(True, "--sample-assets/--no-sample-assets", help="Create sample stub assets"),
     install_uv: bool = typer.Option(True, "--install-uv/--no-install-uv", help="Install uv if missing"),
     dry_run: bool = typer.Option(False, "--dry-run", help="Show what would be created without creating"),
+    start_dagster: bool = typer.Option(False, "--start-dagster", help="Start Dagster UI after project creation"),
 ) -> None:
     """Initialize a new Polster project."""
     rprint(f"[bold]Creating new Polster project: {project_name}[/bold]")
@@ -215,6 +283,10 @@ def init(
         rprint("  dagster dev  # Start Dagster UI")
         rprint("\nTo add new assets:")
         rprint("  polster add-asset")
+
+        # Start Dagster UI if requested
+        if start_dagster:
+            _start_dagster_ui(project_path)
 
 
 @app.command()
