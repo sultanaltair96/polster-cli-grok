@@ -5,7 +5,11 @@ import sys
 
 if __name__ == "__main__":
     # Set DAGSTER_HOME to project-local directory
-    os.environ["DAGSTER_HOME"] = os.path.join(os.getcwd(), ".dagster")
+    dagster_home = os.path.join(os.getcwd(), ".dagster")
+    os.environ["DAGSTER_HOME"] = dagster_home
+
+    # Ensure DAGSTER_HOME directory exists
+    os.makedirs(dagster_home, exist_ok=True)
 
     # Run Dagster with default command line arguments
     from dagster import cli

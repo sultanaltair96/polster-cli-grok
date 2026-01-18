@@ -12,13 +12,15 @@ from dagster import (
     AssetSelection,
 )
 
-# Import asset modules
-from orchestration.assets import bronze, silver, gold
+# Import asset modules directly
+from .assets.bronze import run_bronze_example
+from .assets.silver import run_silver_example
+from .assets.gold import run_gold_example
 
-# Automatically load all assets from each layer
-bronze_assets = load_assets_from_modules([bronze], group_name="bronze")
-silver_assets = load_assets_from_modules([silver], group_name="silver")
-gold_assets = load_assets_from_modules([gold], group_name="gold")
+# Load assets from individual modules
+bronze_assets = load_assets_from_modules([run_bronze_example], group_name="bronze")
+silver_assets = load_assets_from_modules([run_silver_example], group_name="silver")
+gold_assets = load_assets_from_modules([run_gold_example], group_name="gold")
 
 # Combine all assets
 all_assets = [*bronze_assets, *silver_assets, *gold_assets]
