@@ -47,8 +47,13 @@ Polster CLI generates complete, production-ready data pipelines with just one co
 ## 📦 Installation
 
 ```bash
-# Install from PyPI (coming soon)
+# Install from PyPI
 pip install polster
+
+# Or install from source
+git clone https://github.com/sultanaltair96/polster-cli-grok
+cd polster-cli-grok
+pip install -e ".[dev]"
 
 # Or install from source
 git clone https://github.com/sultanaltair96/polster-cli-grok
