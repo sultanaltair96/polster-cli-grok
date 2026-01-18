@@ -1,0 +1,1 @@
+"""Gold assets package initialization."""

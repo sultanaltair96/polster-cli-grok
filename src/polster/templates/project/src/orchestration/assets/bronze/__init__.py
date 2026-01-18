@@ -1,0 +1,1 @@
+"""Bronze assets package initialization."""
