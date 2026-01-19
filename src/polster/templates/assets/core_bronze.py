@@ -10,7 +10,17 @@ from datetime import datetime
 
 import polars as pl
 
-from .storage import write_parquet
+try:
+    # Try relative imports (when run as module through Dagster)
+    from .storage import write_parquet
+except ImportError:
+    # Fall back to absolute imports (when run directly)
+    import sys
+    import os
+
+    # Add src directory to path for absolute imports
+    sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", ".."))
+    from core.storage import write_parquet
 
 
 def extract() -> str:
