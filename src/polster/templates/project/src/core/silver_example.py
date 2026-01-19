@@ -9,6 +9,7 @@ from datetime import datetime, timezone
 
 import polars as pl
 
+from .paths import PROJECT_ROOT, DATA_DIR, BRONZE_DIR, SILVER_DIR, GOLD_DIR
 from .storage import read_parquet_latest, write_parquet
 
 

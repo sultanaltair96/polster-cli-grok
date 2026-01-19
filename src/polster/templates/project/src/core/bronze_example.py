@@ -11,6 +11,7 @@ from datetime import datetime, timezone
 import polars as pl
 from faker import Faker
 
+from .paths import PROJECT_ROOT, DATA_DIR, BRONZE_DIR, SILVER_DIR, GOLD_DIR
 from .storage import write_parquet
 
 
