@@ -98,11 +98,13 @@ dagster dev
 polster init <project_name> [OPTIONS]
 
 # Examples
-polster init my_project                    # Basic project
+polster init my_project                    # Basic project (created in parent directory)
 polster init my_project --git             # With git repo
 polster init my_project --start-dagster   # Auto-start Dagster UI
 polster init my_project --no-sample-assets # Minimal setup
 ```
+
+**Note**: Projects are created in the parent directory (next to the current folder) to keep your workspace organized.
 
 ### Add Assets
 ```bash

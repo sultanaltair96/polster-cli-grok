@@ -176,10 +176,12 @@ def init(
     # Validate project name
     project_name = validate_project_name(project_name)
 
-    # Create project directory
-    project_path = Path(project_name)
+    # Create project directory in parent folder (next to repo)
+    project_path = Path("..") / project_name
     if project_path.exists():
-        rprint(f"[red]Directory '{project_name}' already exists.[/red]")
+        rprint(
+            f"[red]Directory '{project_name}' already exists in parent directory.[/red]"
+        )
         raise typer.Exit(1)
 
     if not dry_run:
