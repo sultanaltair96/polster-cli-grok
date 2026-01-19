@@ -9,7 +9,7 @@ from urllib.parse import urlparse
 
 import polars as pl
 
-from core.paths import DATA_DIR
+from .paths import DATA_DIR
 
 StorageBackend = Literal["local", "adls"]
 
@@ -31,7 +31,11 @@ def get_storage_backend() -> StorageBackend:
 def is_adls_configured() -> bool:
     """Check if ADLS is properly configured."""
     return all(
-        [_load_env("ADLS_ACCOUNT_NAME"), _load_env("ADLS_ACCOUNT_KEY"), _load_env("ADLS_CONTAINER")]
+        [
+            _load_env("ADLS_ACCOUNT_NAME"),
+            _load_env("ADLS_ACCOUNT_KEY"),
+            _load_env("ADLS_CONTAINER"),
+        ]
     )
 
 
@@ -54,7 +58,9 @@ def resolve_path(layer: str, filename: str) -> str:
     account_name = _load_env("ADLS_ACCOUNT_NAME")
     container = _load_env("ADLS_CONTAINER")
     if not account_name or not container:
-        raise ValueError("ADLS_ACCOUNT_NAME and ADLS_CONTAINER are required for ADLS storage")
+        raise ValueError(
+            "ADLS_ACCOUNT_NAME and ADLS_CONTAINER are required for ADLS storage"
+        )
     base_path = _adls_base_path()
     return f"abfss://{container}@{account_name}.dfs.core.windows.net/{base_path}/{layer}/{filename}"
 

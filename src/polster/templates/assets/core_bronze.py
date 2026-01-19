@@ -10,7 +10,7 @@ from datetime import datetime
 
 import polars as pl
 
-from core.storage import write_parquet
+from ..core.storage import write_parquet
 
 
 def extract() -> str:
