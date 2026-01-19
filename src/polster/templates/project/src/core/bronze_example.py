@@ -21,7 +21,7 @@ except ImportError:
     import os
 
     # Add src directory to path for absolute imports
-    sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", ".."))
+    sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
     from core.paths import PROJECT_ROOT, DATA_DIR, BRONZE_DIR, SILVER_DIR, GOLD_DIR
     from core.storage import write_parquet
 
