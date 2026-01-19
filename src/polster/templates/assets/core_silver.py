@@ -10,7 +10,7 @@ from datetime import datetime
 
 import polars as pl
 
-from ..core.storage import read_parquet_latest, write_parquet
+from .storage import read_parquet_latest, write_parquet
 
 
 def transform() -> str:
