@@ -67,7 +67,7 @@ if bronze_assets:
     jobs.append(bronze_job)
     bronze_schedule = ScheduleDefinition(
         job=bronze_job,
-        cron_schedule="0 0 * * *",  # Daily at 12:00 AM
+        cron_schedule="1 0 * * *",  # Daily at 12:01 AM
     )
     schedules.append(bronze_schedule)
 
