@@ -194,9 +194,18 @@ def init(
 
     # Copy base template
     def copy_tree(src_dir: Path, dest_dir: Path) -> None:
+        skip_dirs = {
+            ".ruff_cache",
+            "__pycache__",
+            ".git",
+            ".pytest_cache",
+            ".mypy_cache",
+        }
         for item in src_dir.rglob("*"):
             if item.is_file():
                 rel_path = item.relative_to(src_dir)
+                if any(part in skip_dirs for part in rel_path.parts):
+                    continue
                 dest_file = dest_dir / rel_path
                 replacements = {"{{PROJECT_NAME}}": project_name}
                 if dry_run:
