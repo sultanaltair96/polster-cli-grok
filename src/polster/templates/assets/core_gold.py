@@ -19,7 +19,7 @@ except ImportError:
     import os
 
     # Add src directory to path for absolute imports
-    sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", ".."))
+    sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
     from core.storage import read_parquet_latest, write_parquet
 
 
