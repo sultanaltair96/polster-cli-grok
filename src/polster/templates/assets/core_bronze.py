@@ -28,28 +28,10 @@ def extract() -> str:
 
     Returns:
         str: Path to the written parquet file.
-
-    Example:
-        # Create a simple DataFrame for testing
-        df = pl.DataFrame({
-            "id": [1, 2, 3],
-            "name": ["Alice", "Bob", "Charlie"],
-            "value": [10.5, 20.3, 15.7],
-            "created_at": ["2024-01-01", "2024-01-02", "2024-01-03"]
-        })
-
-        # Add metadata
-        df = df.with_columns(
-            pl.lit(datetime.utcnow().isoformat()).alias("fetched_at")
-        )
-
-        # Write with timestamp
-        timestamp = datetime.utcnow().strftime("%Y%m%dT%H%M%SZ")
-        return write_parquet(df, "bronze", f"bronze_{{ASSET_NAME}}_{timestamp}.parquet")
     """
-    # TODO: Implement your data extraction logic here
-
-    # Example code - uncomment to test:
+    # TODO: Uncomment and modify this example implementation with your actual data extraction logic
+    #
+    # # Create sample data (replace with your actual data source)
     # df = pl.DataFrame({
     #     "id": [1, 2, 3],
     #     "name": ["Alice", "Bob", "Charlie"],
@@ -57,11 +39,19 @@ def extract() -> str:
     #     "created_at": ["2024-01-01", "2024-01-02", "2024-01-03"]
     # })
     #
+    # # Add metadata
     # df = df.with_columns(
     #     pl.lit(datetime.utcnow().isoformat()).alias("fetched_at")
     # )
     #
+    # # Write with timestamp
     # timestamp = datetime.utcnow().strftime("%Y%m%dT%H%M%SZ")
     # return write_parquet(df, "bronze", f"bronze_{{ASSET_NAME}}_{timestamp}.parquet")
+    #
+    # Note: Uncomment the above code and modify it for your use case
 
-    raise NotImplementedError("Implement the extract() function")
+    pass  # TODO: Replace with your implementation and remove this pass statement
+
+
+if __name__ == "__main__":
+    extract()

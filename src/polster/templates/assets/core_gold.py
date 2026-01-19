@@ -28,41 +28,31 @@ def aggregate() -> str:
 
     Returns:
         str: Path to the written parquet file.
-
-    Example:
-        # Read latest silver data
-        df = read_parquet_latest("silver", "silver_{{ASSET_NAME}}")
-
-        # Apply one aggregation (example: total value by date)
-        result = df.group_by("date").agg(
-            total_value=pl.col("value").sum(),
-            record_count=pl.len()
-        ).sort("date")
-
-        # Add aggregation metadata
-        result = result.with_columns(
-            pl.lit(datetime.utcnow().isoformat()).alias("aggregated_at")
-        )
-
-        # Write with timestamp
-        timestamp = datetime.utcnow().strftime("%Y%m%dT%H%M%SZ")
-        return write_parquet(result, "gold", f"gold_{{ASSET_NAME}}_{timestamp}.parquet")
     """
-    # TODO: Implement your data aggregation logic here
-
-    # Example code - uncomment to test (requires silver data):
-    # df = read_parquet_latest("silver", "silver_{{ASSET_NAME}}")
+    # TODO: Uncomment and modify this example implementation with your actual data aggregation logic
     #
-    # result = df.group_by("date").agg(
+    # # Read latest silver data
+    # df = read_parquet_latest("silver", "silver_{{ASSET_NAME}}_")
+    #
+    # # Apply aggregation (example: group by categories)
+    # result = df.group_by("category").agg(
     #     total_value=pl.col("value").sum(),
-    #     record_count=pl.len()
-    # ).sort("date")
+    #     record_count=pl.len(),
+    # )
     #
+    # # Add aggregation metadata
     # result = result.with_columns(
     #     pl.lit(datetime.utcnow().isoformat()).alias("aggregated_at")
     # )
     #
+    # # Write with timestamp
     # timestamp = datetime.utcnow().strftime("%Y%m%dT%H%M%SZ")
     # return write_parquet(result, "gold", f"gold_{{ASSET_NAME}}_{timestamp}.parquet")
+    #
+    # Note: Uncomment the above code and modify it for your use case
 
-    raise NotImplementedError("Implement the aggregate() function")
+    pass  # TODO: Replace with your implementation and remove this pass statement
+
+
+if __name__ == "__main__":
+    aggregate()

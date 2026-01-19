@@ -28,39 +28,31 @@ def transform() -> str:
 
     Returns:
         str: Path to the written parquet file.
-
-    Example:
-        # Read latest bronze data
-        df = read_parquet_latest("bronze", "bronze_{{ASSET_NAME}}")
-
-        # Apply one transformation (example: convert created_at to date)
-        df = df.with_columns(
-            pl.col("created_at").str.to_date("%Y-%m-%d").alias("date")
-        )
-
-        # Add transformation metadata
-        df = df.with_columns(
-            pl.lit(datetime.utcnow().isoformat()).alias("transformed_at")
-        )
-
-        # Write with timestamp
-        timestamp = datetime.utcnow().strftime("%Y%m%dT%H%M%SZ")
-        return write_parquet(df, "silver", f"silver_{{ASSET_NAME}}_{timestamp}.parquet")
     """
-    # TODO: Implement your data transformation logic here
-
-    # Example code - uncomment to test (requires bronze data):
-    # df = read_parquet_latest("bronze", "bronze_{{ASSET_NAME}}")
+    # TODO: Uncomment and modify this example implementation with your actual data transformation logic
     #
-    # df = df.with_columns(
-    #     pl.col("created_at").str.to_date("%Y-%m-%d").alias("date")
+    # # Read latest bronze data
+    # df = read_parquet_latest("bronze", "bronze_{{ASSET_NAME}}_")
+    #
+    # # Apply transformations (example: clean data types)
+    # cleaned = df.with_columns(
+    #     pl.col("created_at").cast(pl.Datetime),
+    #     pl.col("value").cast(pl.Float64).round(2),
     # )
     #
-    # df = df.with_columns(
+    # # Add transformation metadata
+    # cleaned = cleaned.with_columns(
     #     pl.lit(datetime.utcnow().isoformat()).alias("transformed_at")
     # )
     #
+    # # Write with timestamp
     # timestamp = datetime.utcnow().strftime("%Y%m%dT%H%M%SZ")
-    # return write_parquet(df, "silver", f"silver_{{ASSET_NAME}}_{timestamp}.parquet")
+    # return write_parquet(cleaned, "silver", f"silver_{{ASSET_NAME}}_{timestamp}.parquet")
+    #
+    # Note: Uncomment the above code and modify it for your use case
 
-    raise NotImplementedError("Implement the transform() function")
+    pass  # TODO: Replace with your implementation and remove this pass statement
+
+
+if __name__ == "__main__":
+    transform()
