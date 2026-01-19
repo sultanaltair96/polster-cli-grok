@@ -9,8 +9,19 @@ from datetime import datetime, timezone
 
 import polars as pl
 
-from .paths import PROJECT_ROOT, DATA_DIR, BRONZE_DIR, SILVER_DIR, GOLD_DIR
-from .storage import read_parquet_latest, write_parquet
+try:
+    # Try relative imports (when run as module through Dagster)
+    from .paths import PROJECT_ROOT, DATA_DIR, BRONZE_DIR, SILVER_DIR, GOLD_DIR
+    from .storage import read_parquet_latest, write_parquet
+except ImportError:
+    # Fall back to absolute imports (when run directly)
+    import sys
+    import os
+
+    # Add src directory to path for absolute imports
+    sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", ".."))
+    from core.paths import PROJECT_ROOT, DATA_DIR, BRONZE_DIR, SILVER_DIR, GOLD_DIR
+    from core.storage import read_parquet_latest, write_parquet
 
 
 def transform() -> str:
