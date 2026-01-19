@@ -18,20 +18,22 @@ def transform() -> str:
     Returns:
         str: Path to the written parquet file.
     """
-    orders_df = read_parquet_latest("bronze", "bronze_orders_")
-    payments_df = read_parquet_latest("bronze", "bronze_payments_")
+    # Read latest bronze orders data
+    df = read_parquet_latest("bronze", "bronze_orders_")
 
-    joined = orders_df.join(payments_df, on="order_id", how="left")
+    # Simple transformation: filter out cancelled orders and standardize data types
+    cleaned = (
+        df.filter(pl.col("status") != "cancelled")
+        .with_columns(
+            [
+                pl.col("order_date").cast(pl.Datetime),
+                pl.col("total_amount").cast(pl.Float64).round(2),
+            ]
+        )
+        .with_columns(pl.col("order_date").dt.date().alias("order_day"))
+    )
 
-    cleaned = joined.with_columns(
-        [
-            pl.col("order_date").cast(pl.Datetime),
-            pl.col("total_amount").cast(pl.Float64).round(2),
-            pl.col("paid_amount").cast(pl.Float64).fill_null(0.0).round(2),
-            (pl.col("payment_status") == "paid").alias("is_paid"),
-        ]
-    ).with_columns(pl.col("order_date").dt.date().alias("order_day"))
-
+    # Add transformation timestamp
     transform_time = datetime.now(timezone.utc).replace(microsecond=0).isoformat()
     cleaned = cleaned.with_columns(pl.lit(transform_time).alias("transformed_at"))
 

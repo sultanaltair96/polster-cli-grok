@@ -1,12 +1,11 @@
 """Gold layer example - Data aggregation.
 
 This file demonstrates how to aggregate silver data and write it to the gold layer.
-Uncomment the example code below to test quickly.
 """
 
 from __future__ import annotations
 
-from datetime import datetime
+from datetime import datetime, timezone
 
 import polars as pl
 
@@ -18,41 +17,28 @@ def aggregate() -> str:
 
     Returns:
         str: Path to the written parquet file.
-
-    Example:
-        # Read latest silver data
-        df = read_parquet_latest("silver", "silver_example")
-
-        # Apply one aggregation (example: total value by date)
-        result = df.group_by("date").agg(
-            total_value=pl.col("value").sum(),
-            record_count=pl.len()
-        ).sort("date")
-
-        # Add aggregation metadata
-        result = result.with_columns(
-            pl.lit(datetime.utcnow().isoformat()).alias("aggregated_at")
-        )
-
-        # Write with timestamp
-        timestamp = datetime.utcnow().strftime("%Y%m%dT%H%M%SZ")
-        return write_parquet(result, "gold", f"gold_example_{timestamp}.parquet")
     """
-    # TODO: Implement your data aggregation logic here
+    # Read latest silver orders data
+    df = read_parquet_latest("silver", "silver_orders_")
 
-    # Example code - uncomment to test (requires silver data):
-    # df = read_parquet_latest("silver", "silver_example")
-    #
-    # result = df.group_by("date").agg(
-    #     total_value=pl.col("value").sum(),
-    #     record_count=pl.len()
-    # ).sort("date")
-    #
-    # result = result.with_columns(
-    #     pl.lit(datetime.utcnow().isoformat()).alias("aggregated_at")
-    # )
-    #
-    # timestamp = datetime.utcnow().strftime("%Y%m%dT%H%M%SZ")
-    # return write_parquet(result, "gold", f"gold_example_{timestamp}.parquet")
+    # Simple aggregation: total sales and order count by status
+    result = (
+        df.group_by("status")
+        .agg(
+            total_sales=pl.col("total_amount").sum().round(2),
+            order_count=pl.len(),
+            avg_order_value=(pl.col("total_amount").sum() / pl.len()).round(2),
+        )
+        .sort("total_sales", descending=True)
+    )
 
-    raise NotImplementedError("Implement the aggregate() function")
+    # Add aggregation timestamp
+    aggregate_time = datetime.now(timezone.utc).replace(microsecond=0).isoformat()
+    result = result.with_columns(pl.lit(aggregate_time).alias("aggregated_at"))
+
+    timestamp = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")
+    return write_parquet(result, "gold", f"gold_order_summary_{timestamp}.parquet")
+
+
+if __name__ == "__main__":
+    aggregate()
