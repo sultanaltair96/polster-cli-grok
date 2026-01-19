@@ -11,6 +11,25 @@ That's Polster - your personal data factory builder! 🏭✨
 
 ---
 
+## **📋 Quick Navigation**
+
+- [🎯 Why Polster Makes Data Fun](#-why-polster-makes-data-fun)
+- [⚡ Your First Data Factory (5 Minutes!)](#-your-first-data-factory-5-minutes)
+- [🏭 How Your Data Factory Works](#-how-your-data-factory-works)
+- [🛠️ Customize Your Factory](#️-customize-your-factory)
+- [⚙️ Your Factory's Smart Automation](#️-your-factorys-smart-automation)
+- [☁️ Scale to Cloud Storage](#️-scale-to-cloud-storage)
+- [🎓 Learning Your Way](#-learning-your-way)
+- [🔧 Troubleshooting Your Factory](#-troubleshooting-your-factory)
+- [🔬 Technical Deep Dive (Optional)](#-technical-deep-dive-optional)
+- [🚀 What's Next?](#-whats-next)
+- [📦 Installation](#-installation)
+- [🛠️ Development](#️-development)
+
+---
+
+
+
 ## **🎯 Why Polster Makes Data Fun**
 
 **The Data Factory Revolution**: Traditional data tools are like building a car factory from scratch. Polster gives you a complete, working factory in minutes!
