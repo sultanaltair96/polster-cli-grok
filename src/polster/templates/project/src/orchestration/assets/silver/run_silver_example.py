@@ -11,6 +11,7 @@ from src.orchestration.utils import create_output_with_metadata
     description="Silver example asset - data transformation",
     compute_kind="polars",
     automation_condition=AutomationCondition.eager(),
+    deps=["run_bronze_example"],
 )
 def run_silver_example():
     """Run silver example transformation."""

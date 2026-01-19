@@ -14,6 +14,7 @@ from ..utils import create_output_with_metadata
     description="Silver asset for {{ASSET_NAME}}",
     compute_kind="polars",
     automation_condition=AutomationCondition.eager(),
+    deps=["run_bronze_{{ASSET_NAME}}"],
 )
 def run_silver_{{ASSET_NAME}}():
     """Run silver transformation for {{ASSET_NAME}}."""

@@ -11,6 +11,7 @@ from src.orchestration.utils import create_output_with_metadata
     description="Gold example asset - data aggregation",
     compute_kind="polars",
     automation_condition=AutomationCondition.eager(),
+    deps=["run_silver_example"],
 )
 def run_gold_example():
     """Run gold example aggregation."""
