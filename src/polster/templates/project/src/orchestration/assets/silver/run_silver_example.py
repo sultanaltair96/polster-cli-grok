@@ -2,8 +2,8 @@
 
 from dagster import asset
 
-from core.silver_example import transform
-from orchestration.utils import create_output_with_metadata
+from ...core.silver_example import transform
+from ..utils import create_output_with_metadata
 
 
 @asset(

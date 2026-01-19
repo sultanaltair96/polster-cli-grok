@@ -2,8 +2,8 @@
 
 from dagster import asset
 
-from core.bronze_example import extract
-from orchestration.utils import create_output_with_metadata
+from ...core.bronze_example import extract
+from ..utils import create_output_with_metadata
 
 
 @asset(
