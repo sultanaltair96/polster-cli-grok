@@ -4,6 +4,11 @@ import os
 import sys
 
 if __name__ == "__main__":
+    # Add src directory to Python path for proper imports
+    src_path = os.path.join(os.getcwd(), "src")
+    if src_path not in sys.path:
+        sys.path.insert(0, src_path)
+
     # Set DAGSTER_HOME to project-local directory
     dagster_home = os.path.join(os.getcwd(), ".dagster")
     os.environ["DAGSTER_HOME"] = dagster_home

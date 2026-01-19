@@ -2,8 +2,8 @@
 
 from dagster import asset
 
-from ...core.gold_example import aggregate
-from ..utils import create_output_with_metadata
+from src.core.gold_example import aggregate
+from src.orchestration.utils import create_output_with_metadata
 
 
 @asset(
