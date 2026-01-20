@@ -350,11 +350,15 @@ load_from:
             )
             rprint("\n🚀 Quick start (copy & paste):")
             rprint(f"  {quick_cmd}")
-            rprint("\n📝 Or manually:")
+            rprint("\n🚀 Recommended workflow:")
             rprint(f"  cd ../{project_name}")
             rprint(f"  source {activation_cmd}")
-            rprint("  dagster dev")
-            rprint("  # Or use: python run_dagster.py --ui")
+            rprint("  python run_dagster.py --ui  # Materialize + launch UI")
+            rprint("\n📝 Alternative options:")
+            rprint("  python run_dagster.py        # Materialize only")
+            rprint(
+                "  PYTHONPATH=src dagster dev   # Direct UI (requires manual PYTHONPATH)"
+            )
         else:
             # Fallback when virtual environment setup failed
             rprint("\nTo get started:")
