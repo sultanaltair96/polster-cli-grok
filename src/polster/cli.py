@@ -235,7 +235,7 @@ def init(
     copy_tree(template_dir, project_path)
 
     # Create workspace.yaml for Dagster
-    workspace_content = f"""load_from:
+    workspace_content = """load_from:
   - python_file: src/orchestration/definitions.py
 """
     workspace_file = project_path / "workspace.yaml"
@@ -488,28 +488,39 @@ except ImportError:
     # Update definitions.py to include the new asset
     defs_file = project_path / "src" / "orchestration" / "definitions.py"
     if defs_file.exists():
-        content = defs_file.read_text()
+        lines = defs_file.read_text().splitlines()
         modules_var = f"{layer}_modules"
-        import_line = f"    from .assets.{layer} import {asset_function_name}"
-        append_line = f"    {modules_var}.append({asset_function_name})"
-
-        # Find the existing try block for this layer's example
         example_name = f"run_{layer}_example"
-        example_import = f"    from .assets.{layer} import {example_name}"
         example_append = f"    {modules_var}.append({example_name})"
 
-        if example_import in content and example_append in content:
-            # Insert after the example's append
-            insert_after = example_append
-            insert_text = f"""\ntry:
-{import_line}
-{append_line}
+        # Find the index of the example append line
+        try:
+            example_idx = lines.index(example_append)
+        except ValueError:
+            # Example not found, skip updating definitions.py
+            pass
+        else:
+            # Find the corresponding except ImportError: pass after it
+            insert_idx = -1
+            for i in range(example_idx + 1, len(lines)):
+                if lines[i].strip() == "except ImportError:":
+                    if i + 1 < len(lines) and lines[i + 1].strip() == "pass":
+                        # Insert after the pass line
+                        insert_idx = i + 2
+                        break
+
+            if insert_idx != -1:
+                insert_text = f"""try:
+    from .assets.{layer} import {asset_function_name}
+    {modules_var}.append({asset_function_name})
 except ImportError:
     pass"""
-            content = content.replace(insert_after, insert_after + insert_text)
-
-        defs_file.write_text(content)
-        rprint(f"[green]✓[/green] Updated: {defs_file.relative_to(project_path)}")
+                lines.insert(insert_idx, insert_text)
+                content = "\n".join(lines)
+                defs_file.write_text(content)
+                rprint(
+                    f"[green]✓[/green] Updated: {defs_file.relative_to(project_path)}"
+                )
 
     rprint(f"[green]✓[/green] Created core file: {core_file.relative_to(project_path)}")
     rprint(
