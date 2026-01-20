@@ -298,6 +298,37 @@ List all assets in the current project.
 - `--layer <layer>`: Filter by layer
 - `--format <table|json>`: Output format
 
+### `polster remove-asset`
+Remove an asset from the current Polster project.
+
+**Required Options (one of):**
+- `--layer <bronze|silver|gold>` and `--name <asset_name>`: Direct removal
+- Interactive mode: Run without flags for guided selection
+
+**Optional Options:**
+- `--dry-run`: Preview what would be removed without deleting
+- `--force`: Skip confirmations and dependency checks
+
+**Safety Features:**
+- Blocks removal if other assets depend on the target asset
+- High-impact removals (>3 assets) require typing "CONFIRM"
+- "All" selections require typing "REMOVE_ALL_ASSETS"
+
+**Examples:**
+```bash
+# Interactive removal (recommended)
+polster remove-asset
+
+# Direct removal
+polster remove-asset --layer bronze --name user_events
+
+# Force removal (bypasses safety checks)
+polster remove-asset --layer silver --name clean_data --force
+
+# Preview removal
+polster remove-asset --layer gold --name metrics --dry-run
+```
+
 ### `polster validate`
 Validate project structure and dependencies.
 

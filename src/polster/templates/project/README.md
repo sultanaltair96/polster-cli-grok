@@ -114,6 +114,31 @@ def gold_user_metrics(silver_clean_users):
     )
 ```
 
+### Remove Assets
+If you need to remove assets from your pipeline, use the `polster remove-asset` command:
+
+**Remove a specific asset:**
+```bash
+polster remove-asset --layer bronze --name user_events
+```
+
+**Interactive removal with safety checks:**
+```bash
+polster remove-asset
+# Select layer, then choose from numbered list of assets
+```
+
+**Force removal (bypasses dependency checks):**
+```bash
+polster remove-asset --layer silver --name clean_users --force
+```
+
+**Safety Features:**
+- Automatically detects and warns about downstream dependencies
+- Requires confirmation for removals that would break the pipeline
+- Use `--dry-run` to preview what would be removed without making changes
+- High-impact removals (>3 assets) require typing "CONFIRM"
+
 ## 📊 Running & Monitoring Your Pipeline
 
 ### Development Mode
@@ -275,7 +300,8 @@ ADLS_ACCOUNT_KEY=your_key_here
 
 1. **Customize your assets** - Edit the generated files in `src/core/`
 2. **Add more assets** - Use `polster add-asset` to expand your pipeline
-3. **Set up scheduling** - Configure cron jobs or your orchestrator
+3. **Remove assets if needed** - Use `polster remove-asset` to safely remove assets
+4. **Set up scheduling** - Configure cron jobs or your orchestrator
 4. **Add tests** - Test your transformations with `pytest`
 5. **Deploy to production** - Set up cloud storage and monitoring
 
