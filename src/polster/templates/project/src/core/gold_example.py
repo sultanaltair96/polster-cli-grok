@@ -5,7 +5,7 @@ This file demonstrates how to aggregate silver data and write it to the gold lay
 
 from __future__ import annotations
 
-from datetime import datetime
+from datetime import UTC, datetime
 
 import polars as pl
 
@@ -43,10 +43,10 @@ def aggregate() -> str:
     )
 
     # Add aggregation timestamp
-    aggregate_time = datetime.now(datetime.UTC).replace(microsecond=0).isoformat()
+    aggregate_time = datetime.now(UTC).replace(microsecond=0).isoformat()
     result = result.with_columns(pl.lit(aggregate_time).alias("aggregated_at"))
 
-    timestamp = datetime.now(datetime.UTC).strftime("%Y%m%dT%H%M%SZ")
+    timestamp = datetime.now(UTC).strftime("%Y%m%dT%H%M%SZ")
     return write_parquet(result, "gold", f"gold_order_summary_{timestamp}.parquet")
 
 

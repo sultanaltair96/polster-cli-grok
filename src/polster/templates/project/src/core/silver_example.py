@@ -5,7 +5,7 @@ This file demonstrates how to transform bronze data and write it to the silver l
 
 from __future__ import annotations
 
-from datetime import datetime
+from datetime import UTC, datetime
 
 import polars as pl
 
@@ -44,10 +44,10 @@ def transform() -> str:
     )
 
     # Add transformation timestamp
-    transform_time = datetime.now(datetime.UTC).replace(microsecond=0).isoformat()
+    transform_time = datetime.now(UTC).replace(microsecond=0).isoformat()
     cleaned = cleaned.with_columns(pl.lit(transform_time).alias("transformed_at"))
 
-    timestamp = datetime.now(datetime.UTC).strftime("%Y%m%dT%H%M%SZ")
+    timestamp = datetime.now(UTC).strftime("%Y%m%dT%H%M%SZ")
     return write_parquet(cleaned, "silver", f"silver_orders_{timestamp}.parquet")
 
 

@@ -6,7 +6,7 @@ This file demonstrates how to extract data and write it to the bronze layer.
 from __future__ import annotations
 
 import random
-from datetime import datetime
+from datetime import UTC, datetime
 
 import polars as pl
 from faker import Faker
@@ -34,7 +34,7 @@ def extract() -> str:
         str: Path to the written parquet file.
     """
     customer_ids = list(range(1, 201))
-    fetch_time = datetime.now(datetime.UTC).replace(microsecond=0).isoformat()
+    fetch_time = datetime.now(UTC).replace(microsecond=0).isoformat()
     orders = []
 
     for idx in range(500):
@@ -53,7 +53,7 @@ def extract() -> str:
         )
 
     df = pl.DataFrame(orders).with_columns(pl.lit(fetch_time).alias("fetched_at"))
-    timestamp = datetime.now(datetime.UTC).strftime("%Y%m%dT%H%M%SZ")
+    timestamp = datetime.now(UTC).strftime("%Y%m%dT%H%M%SZ")
     return write_parquet(df, "bronze", f"bronze_orders_{timestamp}.parquet")
 
 
