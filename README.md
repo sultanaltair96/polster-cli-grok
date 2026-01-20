@@ -57,6 +57,7 @@ That's Polster - your personal data factory builder! 🏭✨
 git clone https://github.com/sultanaltair96/polster-cli-grok
 cd polster-cli-grok
 pip install -e ".[dev]"
+cd ..
 
 polster init sales_analytics
 
