@@ -66,6 +66,34 @@ def ensure_polster_project() -> Path:
     return cwd
 
 
+def get_existing_assets(layer: str, project_path: Path) -> list[str]:
+    """Get existing asset names from upstream layers."""
+    assets = []
+    upstream_layers = []
+    if layer == "silver":
+        upstream_layers = ["bronze"]
+    elif layer == "gold":
+        upstream_layers = ["bronze", "silver"]
+
+    for up_layer in upstream_layers:
+        init_file = (
+            project_path / "src" / "orchestration" / "assets" / up_layer / "__init__.py"
+        )
+        if init_file.exists():
+            content = init_file.read_text()
+            # Extract asset function names from imports
+            for line in content.splitlines():
+                line = line.strip()
+                if line.startswith("from orchestration.assets.") and "import" in line:
+                    # from orchestration.assets.bronze.run_bronze_customers import run_bronze_customers
+                    parts = line.split()
+                    if len(parts) >= 2:
+                        asset_name = parts[-1]  # run_bronze_customers
+                        if asset_name.startswith(f"run_{up_layer}_"):
+                            assets.append(asset_name)
+    return sorted(assets)
+
+
 def run_command(cmd: list[str], cwd: Path | None = None) -> bool:
     """Run a command and return success status."""
     try:
@@ -397,6 +425,63 @@ def add_asset(
         asset_name = Prompt.ask("Asset name (lowercase snake_case)")
         asset_name = validate_asset_name(asset_name)
 
+    # Handle upstream dependencies for silver/gold assets
+    deps = []
+    if layer in ["silver", "gold"]:
+        if Confirm.ask("Do you want to specify upstream dependencies?"):
+            available_assets = get_existing_assets(layer, project_path)
+            if available_assets:
+                rprint(f"\nAvailable upstream assets for {layer}:")
+                for i, asset in enumerate(available_assets, 1):
+                    rprint(f"{i}. {asset}")
+                rprint("0. None")
+
+                while True:
+                    selection = (
+                        Prompt.ask(
+                            "Select upstream assets (comma-separated numbers, or 'all', or 'none')"
+                        )
+                        .strip()
+                        .lower()
+                    )
+
+                    if selection in ["none", "0"]:
+                        deps = []
+                        break
+                    elif selection == "all":
+                        deps = available_assets
+                        break
+                    else:
+                        try:
+                            indices = [int(x.strip()) - 1 for x in selection.split(",")]
+                            selected = []
+                            for idx in indices:
+                                if 0 <= idx < len(available_assets):
+                                    selected.append(available_assets[idx])
+                                else:
+                                    rprint(f"[red]Invalid selection: {idx + 1}[/red]")
+                                    selected = []
+                                    break
+                            if selected:
+                                deps = selected
+                                break
+                        except ValueError:
+                            rprint(
+                                "[red]Invalid input. Use comma-separated numbers.[/red]"
+                            )
+            else:
+                rprint(f"[yellow]No upstream assets found for {layer} layer.[/yellow]")
+        else:
+            # Use default naming convention
+            if layer == "silver":
+                default_dep = f"run_bronze_{asset_name}"
+                deps = [default_dep]
+                rprint(f"Using default upstream: {default_dep}")
+            elif layer == "gold":
+                default_dep = f"run_silver_{asset_name}"
+                deps = [default_dep]
+                rprint(f"Using default upstream: {default_dep}")
+
     # Define file paths
     core_file = project_path / "src" / "core" / f"{layer}_{asset_name}.py"
     orch_file = (
@@ -429,7 +514,7 @@ def add_asset(
         raise typer.Exit(1)
 
     # Create files with replacements
-    replacements = {"{{ASSET_NAME}}": asset_name}
+    replacements = {"{{ASSET_NAME}}": asset_name, "{{DEPS}}": str(deps)}
 
     copy_template_file(core_template, core_file, replacements)
     copy_template_file(orch_template, orch_file, replacements)

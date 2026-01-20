@@ -14,7 +14,7 @@ from orchestration.utils import create_output_with_metadata
     description="Gold asset for {{ASSET_NAME}}",
     compute_kind="polars",
     automation_condition=AutomationCondition.eager(),
-    deps=["run_silver_{{ASSET_NAME}}"],
+    deps={{DEPS}},
 )
 def run_gold_{{ASSET_NAME}}():
     """Run gold aggregation for {{ASSET_NAME}}."""
