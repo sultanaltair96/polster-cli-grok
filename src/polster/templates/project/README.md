@@ -9,7 +9,7 @@ A Polster data orchestration project.
 source .venv/bin/activate  # or `.venv\Scripts\activate` on Windows
 
 # Start Dagster UI (materializes assets automatically)
-python run_dagster.py --ui
+python run_polster.py --ui
 ```
 
 ## Project Structure
@@ -31,9 +31,9 @@ python run_dagster.py --ui
 │           ├── bronze/
 │           ├── silver/
 │           └── gold/
-├── .env.example                  # Environment variables template
-├── run_dagster.py               # Dagster runner script
-└── README.md
+ ├── .env.example                  # Environment variables template
+ ├── run_polster.py               # Polster runner script
+ └── README.md
 ```
 
 ## Adding New Assets
@@ -85,14 +85,14 @@ ruff check .
 
 ```bash
 # Start UI (recommended - includes automatic materialization)
-python run_dagster.py --ui
+python run_polster.py --ui
 
 # Materialize all assets only
-python run_dagster.py
+python run_polster.py
 
 # Start UI without materialization
-python run_dagster.py --no-materialize --ui
+python run_polster.py --no-materialize --ui
 
 # Alternative: Materialize specific assets manually
-# (Use run_dagster.py for most operations)
+# (Use run_polster.py for most operations)
 ```

@@ -340,20 +340,20 @@ load_from:
 
             rprint("\n🚀 Quick start (copy & paste):")
             rprint(
-                f"  cd ../{project_name} && source {activation_cmd} && python run_dagster.py --ui"
+                f"  cd ../{project_name} && source {activation_cmd} && python run_polster.py --ui"
             )
             rprint("\n🚀 Recommended workflow:")
             rprint(f"  cd ../{project_name}")
             rprint(f"  source {activation_cmd}")
-            rprint("  python run_dagster.py --ui  # Materialize + launch UI")
+            rprint("  python run_polster.py --ui  # Materialize + launch UI")
             rprint("\n📝 Alternative options:")
-            rprint("  python run_dagster.py        # Materialize only")
-            rprint("  python run_dagster.py --no-materialize --ui  # Launch UI only")
+            rprint("  python run_polster.py        # Materialize only")
+            rprint("  python run_polster.py --no-materialize --ui  # Launch UI only")
         else:
             # Fallback when virtual environment setup failed
             rprint("\nTo get started:")
             rprint(f"  cd ../{project_name}")
-            rprint("  # Set up virtual environment and run python run_dagster.py --ui")
+            rprint("  # Set up virtual environment and run python run_polster.py --ui")
 
         rprint("\nTo add new assets:")
         rprint("  polster add-asset")
