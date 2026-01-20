@@ -334,9 +334,9 @@ load_from:
             # Generate activation command for the recommended workflow
             is_windows = platform.system() == "Windows"
             if is_windows:
-                activation_cmd = f"{project_name}\\.venv\\Scripts\\activate"
+                activation_cmd = ".venv\\Scripts\\activate"
             else:
-                activation_cmd = f"{project_name}/.venv/bin/activate"
+                activation_cmd = ".venv/bin/activate"
 
             rprint("\n🚀 Quick start (copy & paste):")
             rprint(
