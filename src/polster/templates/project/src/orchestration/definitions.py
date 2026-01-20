@@ -13,12 +13,9 @@ from dagster import (
 )
 
 # Load all assets from asset packages dynamically
-try:
-    from .assets import bronze, silver, gold
+from .assets import bronze, silver, gold
 
-    all_assets = load_assets_from_modules([bronze, silver, gold])
-except ImportError:
-    all_assets = []
+all_assets = load_assets_from_modules([bronze, silver, gold])
 
 # Define jobs and schedules conditionally
 jobs = []
