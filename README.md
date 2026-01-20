@@ -16,11 +16,11 @@ Flexibility without constraints leads to:
 - Data quality added too late
 - Pipelines no one dares to touch
 
-Polster prevents architectural entropy by enforcing medallion architecture — transforming opinion into law.
+Polster enforces medallion architecture as an opinionated framework for organized, efficient ETL and orchestration. While opinionated, it empowers flexibility within structure, ensuring smooth workflows and robust data pipelines.
 
-This isn't improvement. This is the complete reinvention of data engineering.
+This isn’t just an improvement—it’s a disciplined and smarter way to do data engineering.
 
-Welcome to the data factory revolution.
+Polster is more than a toolkit – it's a structured way to approach data engineering with best practices built in.
 
 ## 🎯 POLSTER VS GENERIC ORCHESTRATORS
 
@@ -74,7 +74,7 @@ python src/core/gold_example.py     # Business intelligence supremacy
 python run_polster.py --ui  # 🚀 Your empire conquers automatically
 ```
 
-BOOM. Your medallion data factory is operational. Bronze ingests raw chaos. Silver enforces quality. Gold delivers business victory. All automated, all monitored, all yours.
+With your medallion data factory operational, Polster ensures raw data is processed seamlessly: Bronze ingests data, Silver guarantees quality, and Gold delivers business insights—efficiently and reliably.
 
 This used to require armies of engineers. Now it's a lunch break.
 
@@ -103,7 +103,7 @@ Medallion architecture isn’t a best practice. It’s a physical law of data sy
 - **Purpose:** Revenue-driving insights, ML features, executive dashboards
 - **Architecture role:** Business value convergence - silver becomes competitive advantage
 
-**WHY THIS WORKS:** Dependencies MUST converge upward. Raw ore can't become weapons-grade alloy without refining. Polster enforces this law of data physics automatically.
+**WHY THIS WORKS:** By enforcing natural dependencies upward through medallion layers, Polster ensures streamlined development without the chaos of ad-hoc pipelines.
 
 ## 💡 REAL-WORLD EXAMPLE: E-COMMERCE ANALYTICS PIPELINE
 
