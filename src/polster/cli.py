@@ -487,10 +487,8 @@ def add_asset(
     rprint("\n[bold]Next steps:[/bold]")
     rprint("1. Edit the core file to implement your logic")
     rprint("2. Uncomment the example code to test")
-    rprint("3. Run 'dagster dev' to see your asset in the UI")
-    rprint(
-        f"4. Materialize: 'dagster asset materialize --select run_{layer}_{asset_name}'"
-    )
+    rprint("3. Run 'python run_polster.py --ui' to see your asset in the UI")
+    rprint("4. Your new asset will appear automatically in the Dagster interface")
 
 
 if __name__ == "__main__":
