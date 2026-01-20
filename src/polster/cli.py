@@ -234,6 +234,17 @@ def init(
 
     copy_tree(template_dir, project_path)
 
+    # Create workspace.yaml for Dagster
+    workspace_content = f"""load_from:
+  - python_file: src/orchestration/definitions.py
+"""
+    workspace_file = project_path / "workspace.yaml"
+    if dry_run:
+        rprint(f"Would create: {workspace_file}")
+    else:
+        workspace_file.write_text(workspace_content)
+        rprint("[green]✓[/green] Created workspace.yaml for Dagster")
+
     if not sample_assets and not dry_run:
         # Remove sample assets if not requested
         for asset_file in project_path.glob("src/core/*_example.py"):
