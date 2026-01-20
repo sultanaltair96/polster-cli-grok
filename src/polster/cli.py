@@ -73,7 +73,7 @@ def get_existing_assets(layer: str, project_path: Path) -> list[str]:
     if layer == "silver":
         upstream_layers = ["bronze"]
     elif layer == "gold":
-        upstream_layers = ["bronze", "silver"]
+        upstream_layers = ["silver"]
 
     for up_layer in upstream_layers:
         init_file = (
