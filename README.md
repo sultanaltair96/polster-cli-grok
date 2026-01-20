@@ -80,6 +80,16 @@ Create a new data project with a single command:
 polster init my_project
 ```
 
+### Add a New Asset to Your Project
+
+Polster’s CLI makes it easy to add assets to your Medallion architecture. For example, you can add a new Bronze-layer asset:
+
+```bash
+polster add-asset --layer bronze --name new_bronze_asset
+```
+
+You’ll be guided interactively to define dependencies and align the asset with Polster’s structured framework.
+
 ### Example Pipeline Workflow
 
 Navigate to your project folder and execute the following examples to explore each Medallion layer:
