@@ -243,32 +243,33 @@ python run_polster.py --ui  # 🚀 Factory runs with automated production and mo
 
 ## Adding New Assets
 
-Use the Polster CLI to add new assets with automatic dependency management:
+### Adding a New Asset with the Polster CLI
+
+Use the `polster add-asset` command to add assets while maintaining Polster's structured Medallion architecture. For example:
 
 ```bash
-# Add a new bronze asset (no dependencies)
-polster add-asset --layer bronze --name customers
+# Add a new Bronze-layer asset
+polster add-asset --layer bronze --name raw_data_ingestion
 
-# Add a new silver asset (interactive dependency selection from bronze)
-polster add-asset --layer silver --name customers_cleaned
+# Add a new Silver-layer asset
+polster add-asset --layer silver --name cleaned_data --dependencies bronze_asset_1,bronze_asset_2
 
-# Add a new gold asset (interactive dependency selection from silver)
-polster add-asset --layer gold --name customer_summary
-
-# Or use interactive mode
-polster add-asset
+# Add a new Gold-layer asset
+polster add-asset --layer gold --name analytics_dashboard --dependencies silver_asset_1,silver_asset_2
 ```
 
-This creates two files:
-- `src/core/<layer>_<name>.py` - Your data processing logic
-- `src/orchestration/assets/<layer>/run_<layer>_<name>.py` - Dagster asset definition
+Polster will guide you interactively to ensure asset dependencies follow the Medallion principles. This process automatically generates two files:
+- `src/core/<layer>_<name>.py`: The transformation logic.
+- `src/orchestration/assets/<layer>/<layer>_<name>.py`: The corresponding Dagster asset definition.
 
-**Dependency Management:** Polster enforces medallion architecture principles:
-- **Bronze assets:** No upstream dependencies
-- **Silver assets:** Can depend on multiple bronze assets
-- **Gold assets:** Can depend on multiple silver assets (not bronze)
+### Dependency Management
 
-When creating silver/gold assets, you'll be prompted to select upstream dependencies from the appropriate layer.
+Polster strictly enforces Medallion architecture principles:
+- Bronze assets serve as the data ingestion layer and cannot depend on anything else.
+- Silver assets consolidate and clean data from one or more Bronze assets.
+- Gold assets aggregate and refine insights, relying only on Silver-layer outputs.
+
+This ensures a clear, predictable data lineage while maintaining data quality at each stage.
 
 ## Architecture & Dependencies
 
