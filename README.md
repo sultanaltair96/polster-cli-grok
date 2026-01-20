@@ -1,12 +1,22 @@
-# 🚀 PYTHON BASED FULLY OPEN SOURCE DATA FACTORY
+# 🚀 POLSTER: ENGINEERING LAWS FOR DATA REVOLUTIONS
 
-## 💥 THE DATA ENGINEERING APOCALYPSE (AND THE ONLY SOLUTION)
+## ❄️ THE COLD OPEN: A TRUTH THAT HURTS
 
-Data engineering is fundamentally broken. Teams waste 6+ months building pipelines that fail catastrophically. Dependencies become unmanageable nightmares. Data quality becomes an afterthought. It's like trying to colonize Mars with Excel macros and wishful thinking.
+Most data platforms fail long before they reach scale. Not because of volume — but because of architecture drift. 
 
-The problem isn't the tools. The problem is the foundation. We need to rebuild data engineering from first principles.
+If you’ve ever asked: “Why does this gold table depend on a raw API response?” — you already know the problem. 
 
-Enter Polster: The inevitable evolution. Medallion architecture enforced. Dependencies converging naturally. Quality gates mandatory. Production pipelines in 5 minutes instead of 6 months.
+Polster was born from real production pain, not theory — an antidote to chaos.
+
+The problem isn’t tools like Airflow, Dagster, dbt, or Spark. The problem is that they let you build *anything* without constraint.
+
+Flexibility without constraints leads to:
+- Broken dependency graphs
+- Invisible coupling
+- Data quality added too late
+- Pipelines no one dares to touch
+
+Polster prevents architectural entropy by enforcing medallion architecture — transforming opinion into law.
 
 This isn't improvement. This is the complete reinvention of data engineering.
 
@@ -69,12 +79,15 @@ This used to require armies of engineers. Now it's a lunch break.
 
 ## 🏗️ MEDALLION ARCHITECTURE: THE PHYSICS OF DATA
 
-Medallion architecture isn't optional - it's fundamental mathematics. Like gravity, it cannot be ignored.
+Medallion architecture isn’t a best practice. It’s a physical law of data systems:
+- Raw data must remain immutable
+- Refinement must converge, not fan out
+- Business logic must never depend on raw inputs
 
 **BRONZE LAYER: RAW RESOURCE EXTRACTION** ⛰️
 - **What it creates:** Python scripts that ingest data without transformation
 - **Data sources:** APIs, databases, files, streams - all preserved exactly as received
-- **Purpose:** Maintain audit trails and original fidelity for compliance
+- **Purpose:** Preserve audit trails and original fidelity for compliance
 - **Architecture role:** Fan-out foundation - multiple sources feed the pipeline
 
 **SILVER LAYER: INDUSTRIAL REFINING** ⚙️

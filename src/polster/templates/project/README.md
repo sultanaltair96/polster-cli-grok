@@ -6,7 +6,13 @@ Let's be brutally honest: Data engineering today is a complete disaster. Teams b
 
 The problem isn't the tools. The problem is fundamental. We need to rethink data engineering from first principles.
 
-Enter Polster: The only logical way to build data pipelines. Medallion architecture isn't optional - it's mandatory physics. Bronze → Silver → Gold. Dependencies converge. Quality gates are enforced. And you get production-ready pipelines in 5 minutes instead of 6 months.
+Polster is a Python-based, open-source data factory that enforces medallion architecture at the framework level.
+
+Key principles of enforcement:
+- Bronze assets cannot depend on anything.
+- Silver assets can only depend on bronze.
+- Gold assets can only depend on silver.
+- Quality checks are first-class, not optional.
 
 This changes everything. Welcome to the data engineering revolution.
 
