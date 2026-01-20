@@ -1,6 +1,7 @@
 """CLI entry point for Polster."""
 
 import os
+import platform
 import re
 import shutil
 import subprocess
@@ -64,6 +65,20 @@ def ensure_polster_project() -> Path:
         raise typer.Exit(1)
 
     return cwd
+
+
+def generate_setup_commands(project_name: str, project_path: Path) -> tuple[str, str]:
+    """Generate platform-specific commands for project setup."""
+    is_windows = platform.system() == "Windows"
+
+    if is_windows:
+        activation_cmd = f"{project_name}\\.venv\\Scripts\\activate"
+        quick_cmd = f"cd ..\\{project_name} && {activation_cmd} && dagster dev"
+    else:
+        activation_cmd = f"{project_name}/.venv/bin/activate"
+        quick_cmd = f"cd ../{project_name} && source {activation_cmd} && dagster dev"
+
+    return activation_cmd, quick_cmd
 
 
 def run_command(cmd: list[str], cwd: Path | None = None) -> bool:
@@ -315,12 +330,26 @@ def init(
     # Final instructions
     if not dry_run:
         rprint("\n[bold green]✓ Project created successfully![/bold green]")
-        rprint(f"\nTo get started:")
-        rprint(f"  cd ../{project_name}")
-        rprint(
-            "  source .venv/bin/activate  # or '.venv\\Scripts\\activate' on Windows"
-        )
-        rprint("  dagster dev  # Start Dagster UI")
+        rprint(f"📁 Location: ../{project_name}")
+
+        # Check if virtual environment exists and generate commands
+        venv_path = project_path / ".venv"
+        if venv_path.exists():
+            activation_cmd, quick_cmd = generate_setup_commands(
+                project_name, project_path
+            )
+            rprint("\n🚀 Quick start (copy & paste):")
+            rprint(f"  {quick_cmd}")
+            rprint("\n📝 Or manually:")
+            rprint(f"  cd ../{project_name}")
+            rprint(f"  source {activation_cmd}")
+            rprint("  dagster dev")
+        else:
+            # Fallback when virtual environment setup failed
+            rprint(f"\nTo get started:")
+            rprint(f"  cd ../{project_name}")
+            rprint("  # Set up virtual environment and run dagster dev")
+
         rprint("\nTo add new assets:")
         rprint("  polster add-asset")
 
