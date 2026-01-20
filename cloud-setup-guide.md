@@ -1,56 +1,50 @@
-# 🚀 Polster CLI: Azure Data Lake Storage Setup
+# Polster CLI: Azure Data Lake Storage Setup
 
-**Transform your data factory from local to cloud-scale in 15 minutes!** ☁️
+This guide shows you how to configure Azure Data Lake Storage (ADLS) with Polster CLI for scalable, cloud-based data storage.
 
-This guide walks you through setting up Azure Data Lake Storage (ADLS) with Polster CLI for unlimited scalability and durability.
+## Prerequisites
 
----
+### Azure Requirements
+- Azure subscription (free tier available at [portal.azure.com](https://portal.azure.com))
+- Azure account with resource creation permissions
 
-## 📋 Prerequisites
+### Polster Requirements
+- Polster CLI installed (`pip install polster`)
+- Polster project created (`polster init my_project`)
 
-### **Azure Requirements**
-- ✅ **Azure subscription** (free tier available at [portal.azure.com](https://portal.azure.com))
-- ✅ **Azure account** with resource creation permissions
+## Azure Setup
 
-### **Polster Requirements**
-- ✅ **Polster CLI installed** (`pip install polster`)
-- ✅ **Project created** (`polster init my_project`)
+### Option A: Azure Portal (Recommended)
 
----
-
-## 🔧 Azure Setup (10 minutes)
-
-### **Option A: Azure Portal (Recommended)**
-
-#### **Step 1: Create Storage Account**
+#### Step 1: Create Storage Account
 1. Go to [Azure Portal](https://portal.azure.com) → **"Create a resource"**
 2. Search **"Storage account"** → **"Create"**
 3. **Basics tab**:
    - **Subscription**: Choose your subscription
    - **Resource group**: Create new (e.g., `polster-resources`)
-   - **Storage account name**: Unique name (lowercase, 3-24 chars)
+   - **Storage account name**: Unique name (lowercase, 3-24 chars, no special characters)
    - **Region**: Select closest to you
    - **Performance**: Standard
    - **Redundancy**: Locally-redundant storage (LRS)
 
-#### **Step 2: Enable Data Lake Storage**
+#### Step 2: Enable Data Lake Storage
 1. **Advanced tab** → Check **"Enable hierarchical namespace"**
-2. **Networking tab**: Keep defaults (public access)
+2. **Networking tab**: Keep defaults (public access for development)
 3. **Review + create** → **"Create"**
 
-#### **Step 3: Create Container**
+#### Step 3: Create Container
 1. Navigate to your storage account
 2. **Containers** → **"+ Container"**
 3. **Name**: `polster-data`
 4. **Public access**: Private
 5. **Create**
 
-#### **Step 4: Get Access Key**
+#### Step 4: Get Access Key
 1. **Access keys** in left menu
 2. Copy **"Key 1"** → **"Key value"**
-3. **Save securely** - you'll need this for Polster!
+3. **Save securely** - you'll need this for Polster configuration
 
-### **Option B: Azure CLI**
+### Option B: Azure CLI
 
 ```bash
 # Login to Azure
@@ -77,14 +71,12 @@ az storage account keys list \
   --output table
 ```
 
----
+## Polster Configuration
 
-## ⚙️ Polster Configuration (3 minutes)
-
-### **Create Environment File**
+### Create Environment File
 
 ```bash
-cd my_data_project
+cd my_project
 
 # Create .env file
 cat > .env << EOF
@@ -97,83 +89,70 @@ ADLS_ACCOUNT_KEY=your_access_key_here
 EOF
 ```
 
-### **Security Note**
-🔒 **Never commit `.env` to version control!**
+### Security Note
+**Never commit `.env` to version control!**
 ```bash
 echo ".env" >> .gitignore
 ```
 
----
+## Test Connection
 
-## 🧪 Test Connection (2 minutes)
-
-### **Run Test Script**
+### Run Test Script
 
 ```bash
-# Activate virtual environment
+# Activate virtual environment (if using one)
 source .venv/bin/activate
 
 # Run bronze example (saves to cloud)
 python src/core/bronze_example.py
 ```
 
-### **Verify in Azure Portal**
+### Verify in Azure Portal
 
 1. Go to your storage account → **"Containers"** → **"polster-data"**
 2. You should see: `polster/data/bronze/bronze_orders_*.parquet`
 
-**Success!** 🎉 Your data factory now uses cloud storage.
+**Success!** Your project now uses cloud storage.
 
----
+## Cost Information
 
-## 💰 Cost Information
-
-### **Free Tier Available**
+### Free Tier Available
 - **First 5GB storage**: Free
 - **100,000 operations**: Free
 - **Perfect for getting started!**
 
-### **Pricing (if you exceed free tier)**
+### Pricing (if you exceed free tier)
 - **Storage**: $0.018/GB/month
 - **Operations**: $0.004/10,000 operations
 - **Data transfer**: $0.01/GB outbound
 
 **Example**: Small project (10GB) = ~$0.20/month
 
----
+## Troubleshooting
 
-## 🔍 Quick Troubleshooting
-
-### **Data not appearing in Azure?**
+### Data not appearing in Azure?
 - Check `.env` file exists and variables are correct
 - Verify account name and access key
 - Ensure container name is `polster-data`
 
-### **Permission errors?**
+### Permission errors?
 - Confirm access key is copied correctly
 - Check Azure account has proper permissions
 - Try regenerating access keys in Azure portal
 
-### **Still using local storage?**
+### Still using local storage?
 - Restart any running processes after creating `.env`
 - Check for typos in environment variable names
 - Ensure `.env` is in project root directory
 
----
+## Next Steps
 
-## 🚀 What's Next?
+Your Polster project is now cloud-powered!
 
-**Your data factory is now cloud-powered!** ☁️
-
-- **Run full pipeline**: `dagster dev` to orchestrate all layers
+- **Run full pipeline**: `python run_polster.py --ui` to orchestrate all layers
 - **Scale unlimited**: Handle petabytes of data
 - **Collaborate**: Share data with your team
-- **Go production**: Use managed identities for security
+- **Go production**: Use managed identities for enhanced security
 
-**Questions?** Check the main README or create a GitHub issue.
-
-**Happy data engineering!** 🚀
-
----
-
-*Built with ❤️ for scaling data dreams to cloud reality.*
+**Questions?** Check the main README or create a GitHub issue.</content>
+<parameter name="filePath">cloud-setup-guide.md
