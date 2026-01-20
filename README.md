@@ -73,6 +73,8 @@ python src/core/gold_example.py     # 📊 Create sales reports
 dagster dev  # 🚀 Factory runs automatically every night
 ```
 
+**Note**: Projects are created in the parent directory to keep your workspace organized.
+
 **What You Get**:
 - ✅ Complete data factory ready to run
 - ✅ Sample production lines showing how it works

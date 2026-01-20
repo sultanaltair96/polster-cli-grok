@@ -316,15 +316,10 @@ def init(
     if not dry_run:
         rprint("\n[bold green]✓ Project created successfully![/bold green]")
         rprint(f"\nTo get started:")
-        rprint(f"  cd {project_name}")
-        if shutil.which("uv"):
-            rprint(
-                "  source .venv/bin/activate  # or '.venv\\Scripts\\activate' on Windows"
-            )
-        else:
-            rprint(
-                "  source .venv/bin/activate  # or '.venv\\Scripts\\activate' on Windows"
-            )
+        rprint(f"  cd ../{project_name}")
+        rprint(
+            "  source .venv/bin/activate  # or '.venv\\Scripts\\activate' on Windows"
+        )
         rprint("  dagster dev  # Start Dagster UI")
         rprint("\nTo add new assets:")
         rprint("  polster add-asset")
