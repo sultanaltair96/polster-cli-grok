@@ -485,43 +485,6 @@ except ImportError:
         init_file.write_text(content)
         rprint(f"[green]✓[/green] Updated: {init_file.relative_to(project_path)}")
 
-    # Update definitions.py to include the new asset
-    defs_file = project_path / "src" / "orchestration" / "definitions.py"
-    if defs_file.exists():
-        lines = defs_file.read_text().splitlines()
-        modules_var = f"{layer}_modules"
-        example_name = f"run_{layer}_example"
-        example_append = f"    {modules_var}.append({example_name})"
-
-        # Find the index of the example append line
-        try:
-            example_idx = lines.index(example_append)
-        except ValueError:
-            # Example not found, skip updating definitions.py
-            pass
-        else:
-            # Find the corresponding except ImportError: pass after it
-            insert_idx = -1
-            for i in range(example_idx + 1, len(lines)):
-                if lines[i].strip() == "except ImportError:":
-                    if i + 1 < len(lines) and lines[i + 1].strip() == "pass":
-                        # Insert after the pass line
-                        insert_idx = i + 2
-                        break
-
-            if insert_idx != -1:
-                insert_text = f"""try:
-    from .assets.{layer} import {asset_function_name}
-    {modules_var}.append({asset_function_name})
-except ImportError:
-    pass"""
-                lines.insert(insert_idx, insert_text)
-                content = "\n".join(lines)
-                defs_file.write_text(content)
-                rprint(
-                    f"[green]✓[/green] Updated: {defs_file.relative_to(project_path)}"
-                )
-
     rprint(f"[green]✓[/green] Created core file: {core_file.relative_to(project_path)}")
     rprint(
         f"[green]✓[/green] Created orchestration file: {orch_file.relative_to(project_path)}"
