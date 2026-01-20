@@ -235,7 +235,9 @@ def init(
     copy_tree(template_dir, project_path)
 
     # Create workspace.yaml for Dagster
-    workspace_content = """load_from:
+    workspace_content = """pythonpath:
+  - src
+load_from:
   - python_file: src/orchestration/definitions.py
 """
     workspace_file = project_path / "workspace.yaml"
@@ -352,7 +354,7 @@ def init(
             rprint(f"  cd ../{project_name}")
             rprint(f"  source {activation_cmd}")
             rprint("  dagster dev")
-            rprint("  # Or use: python run_dagster.py")
+            rprint("  # Or use: python run_dagster.py --ui")
         else:
             # Fallback when virtual environment setup failed
             rprint("\nTo get started:")

@@ -34,6 +34,16 @@ SCRIPT_PATH = pathlib.Path(__file__).resolve()
 ROOT = find_project_root(SCRIPT_PATH.parent)
 ENV = build_env(ROOT)
 
+# Parse command line arguments
+import argparse
+
+parser = argparse.ArgumentParser(description="Run Dagster operations")
+parser.add_argument(
+    "--ui", action="store_true", help="Launch Dagster UI after materialization"
+)
+args = parser.parse_args()
+
+# Materialize assets
 cmd = [
     "dagster",
     "asset",
@@ -43,4 +53,9 @@ cmd = [
     "--select",
     "*",
 ]
-sys.exit(subprocess.call(cmd, cwd=ROOT, env=ENV))
+subprocess.call(cmd, cwd=ROOT, env=ENV)
+
+# Launch UI if requested
+if args.ui:
+    print("Launching Dagster UI...")
+    subprocess.call(["dagster", "dev"], cwd=ROOT, env=ENV)
