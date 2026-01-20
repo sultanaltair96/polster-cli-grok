@@ -11,8 +11,29 @@ Polster is a CLI tool that generates production-ready Dagster projects following
 
 Whether you're new to data engineering or a seasoned architect, Polster provides the structure and tooling to build data workflows that scale.
 
+## Background
+
+Polster was born from experimenting with modern Python data tools like Polars and Dagster. These libraries represent the cutting edge of data engineering, and Polster combines their strengths into a batteries-included platform.
+
+**Polars** excels with its lightning-fast, memory-efficient DataFrame operations. Built in Rust, it delivers:
+- **Speed**: Multi-threaded processing that's 5-10x faster than Pandas
+- **Scalability**: Handles millions of rows effortlessly with lazy evaluation
+- **Expressiveness**: Familiar API that feels like Pandas but optimized for performance
+
+**Dagster** revolutionizes pipeline orchestration with data-aware workflows:
+- **Asset Modeling**: Treats data as first-class citizens with automatic lineage tracking
+- **Visibility**: Built-in dashboards and monitoring for production pipelines
+- **Flexibility**: Extensible framework that integrates with modern tools and platforms
+
+**Polster picks up these strengths** and adds:
+- **Enforced Architecture**: Automatic Medallion layers prevent common mistakes
+- **CLI Simplicity**: One-command project generation and asset management
+- **Production Templates**: Ready-to-deploy code with storage, monitoring, and error handling
+- **Batteries Included**: Everything you need to go from idea to production pipeline
+
 ## Table of Contents
 
+- [Background](#background)
 - [Why Polster?](#why-polster)
 - [Key Features](#key-features)
 - [Medallion Architecture](#medallion-architecture)
