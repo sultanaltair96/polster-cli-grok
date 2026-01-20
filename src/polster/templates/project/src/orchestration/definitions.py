@@ -16,8 +16,17 @@ from dagster import (
 try:
     from .assets import bronze, gold, silver
 
+    print(
+        f"DEBUG: Imported asset modules - bronze has run_bronze_example: {hasattr(bronze, 'run_bronze_example')}"
+    )
     all_assets = load_assets_from_modules([bronze, silver, gold])
-except ImportError:
+    print(f"DEBUG: Loaded {len(all_assets)} assets")
+    for asset in all_assets:
+        print(
+            f"DEBUG: Asset - {asset.key}, group: {getattr(asset, 'group_name', 'N/A')}"
+        )
+except ImportError as e:
+    print(f"DEBUG: Import error - {e}")
     all_assets = []
 
 # Define jobs and schedules conditionally
