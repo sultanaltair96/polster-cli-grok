@@ -35,13 +35,14 @@ Polster is **Dagster with opinions turned into laws**:
 
 ## ❌ WHAT POLSTER IS NOT
 
-**Not a low-code drag-and-drop tool** - you write Python code for transformations
-**Not a generic orchestrator** - medallion architecture and dependency rules are enforced
-**Not notebook-first** - production-ready scripts are the default, not experiments
-**Not a replacement for SQL modeling tools** - focuses on Python data pipelines
-**Not trying to be everything** - specializes in opinionated data factories
+Polster is deliberately **not** the following:
+- **A low-code drag-and-drop tool**: Instead, you write Python code for every transformation.
+- **A generic orchestrator**: Medallion architecture and dependency rules are built-in and enforced.
+- **Notebook-first**: Experiments take a backseat; production-ready scripts are the default.
+- **A replacement for SQL modeling tools**: Polster specializes in Python data pipelines.
+- **An all-in-one tool**: It’s a focused solution for opinionated data factories.
 
-Polster knows its boundaries. This focus enables the opinionated design that makes it powerful.
+By knowing its boundaries, Polster remains powerful and avoids the pitfalls of trying to solve everything.
 
 ---
 
