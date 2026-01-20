@@ -5,70 +5,31 @@ assets with eager materialization for silver and gold layers.
 """
 
 from dagster import (
-    AssetSelection,
     Definitions,
-    ScheduleDefinition,
-    define_asset_job,
     load_assets_from_modules,
+    define_asset_job,
+    ScheduleDefinition,
+    AssetSelection,
 )
 
-# Conditionally import asset modules
-bronze_modules = []
-silver_modules = []
-gold_modules = []
+# Import asset modules
+from orchestration.assets import bronze, silver, gold
 
-try:
-    from .assets.bronze import run_bronze_example
-
-    bronze_modules.append(run_bronze_example)
-except ImportError:
-    pass
-
-try:
-    from .assets.silver import run_silver_example
-
-    silver_modules.append(run_silver_example)
-except ImportError:
-    pass
-
-try:
-    from .assets.gold import run_gold_example
-
-    gold_modules.append(run_gold_example)
-except ImportError:
-    pass
-
-# Load assets from modules if they exist
-bronze_assets = (
-    load_assets_from_modules(bronze_modules, group_name="bronze")
-    if bronze_modules
-    else []
-)
-silver_assets = (
-    load_assets_from_modules(silver_modules, group_name="silver")
-    if silver_modules
-    else []
-)
-gold_assets = (
-    load_assets_from_modules(gold_modules, group_name="gold") if gold_modules else []
-)
+# Automatically load all assets from each layer
+bronze_assets = load_assets_from_modules([bronze], group_name="bronze")
+silver_assets = load_assets_from_modules([silver], group_name="silver")
+gold_assets = load_assets_from_modules([gold], group_name="gold")
 
 # Combine all assets
-all_assets = bronze_assets + silver_assets + gold_assets
+all_assets = [*bronze_assets, *silver_assets, *gold_assets]
 
-# Define jobs and schedules conditionally
-jobs = []
-schedules = []
+# Define a job for all bronze assets
+bronze_job = define_asset_job("bronze_job", selection=AssetSelection.groups("bronze"))
 
-if bronze_assets:
-    bronze_job = define_asset_job(
-        "bronze_job", selection=AssetSelection.groups("bronze")
-    )
-    jobs.append(bronze_job)
-    bronze_schedule = ScheduleDefinition(
-        job=bronze_job,
-        cron_schedule="1 0 * * *",  # Daily at 12:01 AM
-    )
-    schedules.append(bronze_schedule)
+# Schedule for bronze assets (runs daily at midnight)
+bronze_schedule = ScheduleDefinition(
+    job=bronze_job,
+    cron_schedule="0 0 * * *",  # Daily at 12:00 AM
+)
 
-defs = Definitions(assets=all_assets, jobs=jobs, schedules=schedules)
+defs = Definitions(assets=all_assets, jobs=[bronze_job], schedules=[bronze_schedule])

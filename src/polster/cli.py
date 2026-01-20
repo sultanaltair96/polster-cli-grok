@@ -447,16 +447,13 @@ def add_asset(
         content = init_file.read_text()
 
         # Add import if not already present
-        import_block = f"""try:
-    from . import {asset_function_name}
-except ImportError:
-    pass"""
-        if f"from . import {asset_function_name}" not in content:
+        import_line = f"from orchestration.assets.{layer}.{asset_function_name} import {asset_function_name}"
+        if import_line not in content:
             # Insert before __all__ or at end
             if "__all__" in content:
-                content = content.replace("__all__", import_block + "\n\n__all__", 1)
+                content = content.replace("__all__", import_line + "\n\n__all__", 1)
             else:
-                content += f"\n{import_block}\n"
+                content += f"\n{import_line}\n"
 
         # Update __all__ if it exists
         if "__all__" in content:
