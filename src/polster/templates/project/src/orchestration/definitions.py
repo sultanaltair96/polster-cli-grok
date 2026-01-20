@@ -12,38 +12,24 @@ from dagster import (
     load_assets_from_modules,
 )
 
-# Load all assets from asset packages dynamically
-try:
-    from .assets import bronze, gold, silver
+# Import asset modules
+from orchestration.assets import bronze, gold, silver
 
-    print(
-        f"DEBUG: Imported asset modules - bronze has run_bronze_example: {hasattr(bronze, 'run_bronze_example')}"
-    )
-    all_assets = load_assets_from_modules([bronze, silver, gold])
-    print(f"DEBUG: Loaded {len(all_assets)} assets")
-    for asset in all_assets:
-        print(
-            f"DEBUG: Asset - {asset.key}, group: {getattr(asset, 'group_name', 'N/A')}"
-        )
-except ImportError as e:
-    print(f"DEBUG: Import error - {e}")
-    all_assets = []
+# Automatically load all assets from each layer
+bronze_assets = load_assets_from_modules([bronze], group_name="bronze")
+silver_assets = load_assets_from_modules([silver], group_name="silver")
+gold_assets = load_assets_from_modules([gold], group_name="gold")
 
-# Define jobs and schedules conditionally
-jobs = []
-schedules = []
+# Combine all assets
+all_assets = [*bronze_assets, *silver_assets, *gold_assets]
 
-# Bronze scheduling (silver/gold use eager conditions)
-bronze_assets = [a for a in all_assets if getattr(a, "group_name", None) == "bronze"]
-if bronze_assets:
-    bronze_job = define_asset_job(
-        "bronze_job", selection=AssetSelection.groups("bronze")
-    )
-    jobs.append(bronze_job)
-    bronze_schedule = ScheduleDefinition(
-        job=bronze_job,
-        cron_schedule="1 0 * * *",  # Daily at 12:01 AM
-    )
-    schedules.append(bronze_schedule)
+# Define a job for all bronze assets
+bronze_job = define_asset_job("bronze_job", selection=AssetSelection.groups("bronze"))
 
-defs = Definitions(assets=all_assets, jobs=jobs, schedules=schedules)
+# Schedule for bronze assets (runs daily at midnight)
+bronze_schedule = ScheduleDefinition(
+    job=bronze_job,
+    cron_schedule="0 0 * * *",  # Daily at 12:00 AM
+)
+
+defs = Definitions(assets=all_assets, jobs=[bronze_job], schedules=[bronze_schedule])
