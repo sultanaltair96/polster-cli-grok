@@ -1,389 +1,130 @@
-# 🚀 POLSTER: ENGINEERING LAWS FOR DATA REVOLUTIONS
+# Polster: Opinionated Framework for Data Engineering
 
-## ❄️ THE COLD OPEN: A TRUTH THAT HURTS
+Polster is an open-source framework designed to simplify ETL processes and data orchestration. By enforcing a structured approach based on Medallion Architecture principles, it helps teams build reliable, scalable, and maintainable data pipelines.
 
-Most data platforms fail long before they reach scale. Not because of volume — but because of architecture drift. 
+## The Challenges in Data Engineering
 
-If you’ve ever asked: “Why does this gold table depend on a raw API response?” — you already know the problem. 
+Many data platforms face challenges due to architecture drift and lack of standards:
+- **Broken dependency graphs** leading to fragile systems.
+- **Invisible coupling** causing untraceable issues.
+- **Late-stage data quality checks**, resulting in errors surfacing in production.
+- **Pipelines that are difficult to debug or extend.**
 
-Polster was born from real production pain, not theory — an antidote to chaos.
-
-The problem isn’t tools like Airflow, Dagster, dbt, or Spark. The problem is that they let you build *anything* without constraint.
-
-Flexibility without constraints leads to:
-- Broken dependency graphs
-- Invisible coupling
-- Data quality added too late
-- Pipelines no one dares to touch
-
-Polster enforces medallion architecture as an opinionated framework for organized, efficient ETL and orchestration. While opinionated, it empowers flexibility within structure, ensuring smooth workflows and robust data pipelines.
-
-This isn’t just an improvement—it’s a disciplined and smarter way to do data engineering.
-
-Polster is more than a toolkit – it's a structured way to approach data engineering with best practices built in.
-
-## 🎯 POLSTER VS GENERIC ORCHESTRATORS
-
-Polster is **Dagster with opinions turned into laws**:
-
-| Generic Dagster | Polster (Opinionated) |
-|-----------------|----------------------|
-| "You can structure however you want" | Bronze → Silver → Gold enforced |
-| Manual dependency declaration | Interactive dependency selection |
-| Flexible but error-prone | Guided toward best practices |
-| Production patterns optional | Production patterns default |
-
-## ❌ WHAT POLSTER IS NOT
-
-Polster is deliberately **not** the following:
-- **A low-code drag-and-drop tool**: Instead, you write Python code for every transformation.
-- **A generic orchestrator**: Medallion architecture and dependency rules are built-in and enforced.
-- **Notebook-first**: Experiments take a backseat; production-ready scripts are the default.
-- **A replacement for SQL modeling tools**: Polster specializes in Python data pipelines.
-- **An all-in-one tool**: It’s a focused solution for opinionated data factories.
-
-By knowing its boundaries, Polster remains powerful and avoids the pitfalls of trying to solve everything.
+Polster helps address these challenges by combining flexibility with a disciplined approach to organization and pipeline management.
 
 ---
 
-
-
-## ⚡ FROM CHAOS TO EMPIRE IN 5 MINUTES
-
-The old paradigm: 6+ months of engineering torture. Endless dependency debates. Pipelines that collapse under their own weight.
-
-The new reality: 5 minutes to a conquering data empire.
-
-```bash
-# 1. Seize the technology (30 seconds)
-git clone https://github.com/sultanaltair96/polster-cli-grok
-cd polster-cli-grok
-pip install -e ".[dev]"
-cd ..
-
-# 2. Forge your empire (2 minutes)
-polster init {{PROJECT_NAME}}
-
-# 3. Test the war machines (3 minutes)
-cd {{PROJECT_NAME}}
-python src/core/bronze_example.py   # Raw data conquest begins
-python src/core/silver_example.py   # Quality transformation warfare
-python src/core/gold_example.py     # Business intelligence supremacy
-
-# 4. Launch total domination!
-python run_polster.py --ui  # 🚀 Your empire conquers automatically
-```
-
-With your medallion data factory operational, Polster ensures raw data is processed seamlessly: Bronze ingests data, Silver guarantees quality, and Gold delivers business insights—efficiently and reliably.
-
-This used to require armies of engineers. Now it's a lunch break.
-
-## 🏗️ MEDALLION ARCHITECTURE: THE PHYSICS OF DATA
-
-Medallion architecture isn’t a best practice. It’s a physical law of data systems:
-- Raw data must remain immutable
-- Refinement must converge, not fan out
-- Business logic must never depend on raw inputs
-
-**BRONZE LAYER: RAW RESOURCE EXTRACTION** ⛰️
-- **What it creates:** Python scripts that ingest data without transformation
-- **Data sources:** APIs, databases, files, streams - all preserved exactly as received
-- **Purpose:** Preserve audit trails and original fidelity for compliance
-- **Architecture role:** Fan-out foundation - multiple sources feed the pipeline
-
-**SILVER LAYER: INDUSTRIAL REFINING** ⚙️
-- **What it creates:** Python assets with schema validation and data cleaning logic
-- **Dependencies:** Multiple bronze assets allowed (enforced by CLI)
-- **Purpose:** Quality gates, error correction, business rule standardization
-- **Architecture role:** Convergence point - multiple bronzes become unified datasets
-
-**GOLD LAYER: WEAPONIZED INTELLIGENCE** 🏆
-- **What it creates:** Python assets with aggregations and business metrics
-- **Dependencies:** Multiple silver assets allowed (bronze forbidden)
-- **Purpose:** Revenue-driving insights, ML features, executive dashboards
-- **Architecture role:** Business value convergence - silver becomes competitive advantage
-
-**WHY THIS WORKS:** By enforcing natural dependencies upward through medallion layers, Polster ensures streamlined development without the chaos of ad-hoc pipelines.
-
-## 💡 REAL-WORLD EXAMPLE: E-COMMERCE ANALYTICS PIPELINE
-
-**Bronze: Raw Orders API** → `bronze_orders.py`
-```python
-# Ingests raw API data without transformation
-# Input: {"order_id": 123, "customer": "alice", "amount": 99.99, "timestamp": "2024-01-01"}
-# Stores exactly as received (audit trail preserved)
-```
-
-**Silver: Cleaned Customer Data** → `silver_customers.py`
-```python
-# Depends on: bronze_orders
-# Validates schemas, removes duplicates, standardizes customer names
-# Applies business rules: active customers only, valid email formats
-# Output: Clean customer dimension table
-```
-
-**Gold: Revenue Analytics** → `gold_revenue.py`
-```python
-# Depends on: silver_customers
-# Calculates: total revenue, customer lifetime value, monthly trends
-# Generates: executive dashboard data, business KPIs
-# Output: Revenue insights ready for dashboards and reports
-```
-
-**Result:** Automated pipeline that turns messy API data into business intelligence. Dependencies converge naturally, quality is enforced at each layer, and the entire flow runs automatically.
-
-## 🚀 ASSET DOMINATION: INTELLIGENT DEPENDENCY CONQUEST
-
-Polster's AI handles dependency management so you can focus on world domination:
-
-```bash
-# Bronze conquest (pure sovereignty)
-polster add-asset --layer bronze --name enemy_intelligence
-
-# Silver warfare (strategic dependency selection)
-polster add-asset --layer silver --name battle_strategy
-# Polster: "Select bronze assets for conquest..."
-# You: enemy_intelligence, supply_lines, terrain_data
-
-# Gold supremacy (enforced architectural purity)
-polster add-asset --layer gold --name victory_probability
-# Polster: Only silver assets allowed - no bronze shortcuts!
-```
-
-**Each conquest includes:**
-- 🗺️ Strategic planning template with clear objectives
-- ⚔️ Battle-tested code samples ready for customization
-- 🏁 Instant victory testing capabilities
-- 🤖 Automatic integration into your empire's command structure
-
-**Dependency Intelligence (Enforced by Imperial AI):**
-- Bronze: Sovereign territories (no dependencies)
-- Silver: Multiple bronze conquests allowed
-- Gold: Multiple silver victories allowed, bronze forbidden
-- Convergence prevents empire fragmentation
-
-## ⚙️ AUTOMATED IMPERIAL OPERATIONS
-
-**"Conquer and Dominate" Execution:**
-
-- **⏰ Scheduled Campaigns**: Bronze operations launch at 00:01 for predictable conquest
-- **🔗 Victory Chains**: Silver activates upon bronze success, gold upon silver triumph
-- **📊 Real-Time Intelligence**: Imperial dashboard monitors all operations
-- **🚨 Strategic Alerts**: Immediate notifications of battlefield setbacks
-
-**Zero Manual Intervention**: Your empire expands autonomously while you rule!
-
-## ☁️ SCALE TO INTERGALACTIC DOMINION
-
-**From Laptop to Galaxy:**
-
-```bash
-# Local conquest (perfect for initial campaigns)
-STORAGE_BACKEND=local  # Data secured in local vaults
-
-# Galactic expansion (for empire-scale operations)
-STORAGE_BACKEND=adls   # Azure Data Lake dominion
-ADLS_ACCOUNT_NAME=your_imperial_account
-ADLS_CONTAINER=your_treasure_vault
-```
-
-**Automatic Contingency Protocols**: Cloud failures? Local storage maintains operations. Never surrender territory.
-
-## 🎓 YOUR CONQUEST LEARNING PATH
-
-**Cadet to Emperor Progression:**
-
-1. **🎖️ Initiate Victory**: 5-minute sample empire activation
-2. **⚔️ Tactical Mastery**: Add one custom asset conquest
-3. **👑 Imperial Achievement**: Automated nightly intelligence reports
-
-**Advanced Conquest Capabilities** (When Ready for Galactic War):
-- Multi-front data source campaigns
-- Complex strategic business logic
-- Imperial team coordination
-- Production deployment domination
-
-**Zero Experience Required**: Conquer through doing. Samples guide your ascension.
-
-## 🔧 TROUBLESHOOTING YOUR EMPIRE
-
-### **"War Machines Won't Activate!"**
-```bash
-# Confirm you're in imperial command center
-cd your_empire_name
-
-# Power up the throne
-source .venv/bin/activate
-
-# Test weapon systems
-python src/core/bronze_example.py  # ✅ Conquest begins!
-```
-
-### **"Imperial Dashboard Won't Load!"**
-- Confirm you're in the correct empire directory
-- Virtual environment must be energized
-- Alternative: `python run_polster.py --ui` (always works)
-
-### **"Intelligence Disappeared!"**
-- Check `data/` vaults in your empire
-- Bronze, silver, gold intelligence stored separately
-- Execute individual scripts to regenerate battle data
-
-## 🔬 TECHNICAL SUPREMACY (FOR THE CURIOUS CONQUERORS)
-
-<details><summary>Click to expand the engineering secrets</summary>
-
-*For those who want to understand the technological empire*
-
-### **Architectural Foundations**
-
-**Template-Driven Conquest Generation**:
-Polster uses Jinja2 templates to forge consistent empire structures. Every project follows imperial standards while remaining customizable for your conquest strategy.
-
-**Dynamic Territory Mapping**:
-```python
-# paths.py marches up directories to locate 'src' stronghold
-# Enables script execution from any battlefront
-```
-This allows `python src/core/bronze_example.py` to function from command center, outposts, or external reconnaissance.
-
-**Adaptive Import Protocols**:
-```python
-try:
-    from .storage import write_parquet  # Orchestration campaign
-except ImportError:
-    from core.storage import write_parquet  # Direct tactical execution
-```
-Unified codebase operates in both imperial command (Dagster) and field testing (direct execution) modes.
-
-### **Automation War Strategy**
-
-**Why Eager Execution Dominates?**
-- Bronze: Scheduled (00:01) - predictable resource arrival
-- Silver/Gold: Eager - immediate response to upstream victories
-- Minimizes latency, handles variable battle timing, prevents partial campaigns
-
-**Victory Chain**:
-```
-Bronze (scheduled) → Silver (eager) → Gold (eager)
-```
-
-### **Storage Empire**
-
-**Backend Selection Matrix**:
-```python
-backend = os.getenv("STORAGE_BACKEND", "local")
-# Conquers: local, adls (Azure Data Lake dominion)
-```
-
-**Environment Variables Supremacy:**
-- Zero code modifications between dev/staging/production theaters
-- Seamless CI/CD integration protocols
-- Twelve-factor app doctrine compliance
-
-**Automatic Contingency Networks**:
-- ADLS betrayal → local storage maintains operations
-- Missing Azure armaments → local fallback activation
-- Never abandons conquered territory
-
-### **Strategic Design Decisions**
-
-| Imperial Edict | Strategic Rationale | Tactical Tradeoff |
-|----------------|-------------------|-------------------|
-| **Python Scripts** | Production supremacy from inception | Less interactive than notebook outposts |
-| **Dagster** | Asset-focused, superior intelligence dashboard | Learning curve vs Airflow simplicity |
-| **Templates** | Consistent empire structure, versioned conquests | Less dynamic than code generation |
-| **Eager Automation** | Data-driven victory campaigns | More complex than fixed battle schedules |
-
-### **Performance Domination**
-
-- **Local Campaigns**: Commands datasets up to available memory reserves
-- **Galactic Operations**: Scales with Dagster agents and cloud storage empires
-- **Memory Efficiency**: Polars processes intelligence at lightning speed
-
-</details>
-
-## 🎯 CONQUEST OPPORTUNITIES: WHAT TO BUILD NEXT
-
-**Ready to Conquer New Territories?**
-
-- 📈 **Revenue Empire**: Track galactic sales, customer migrations, product dominance
-- 🎯 **Marketing Supremacy**: Campaign effectiveness, ROI conquest, audience segmentation
-- 📊 **Inventory Intelligence**: Stock optimization, demand prediction, supply chain victory
-- 👥 **Customer Domination**: User segmentation, behavior prediction, lifetime value conquest
-
-**Join the Imperial Legion**:
-- 📖 Study advanced conquest manuals and battle plans
-- 💬 Coordinate with fellow emperors in the imperial forum
-- 🌟 Showcase your data empire victories!
+## Why Polster?
+
+Unlike generic orchestrators, Polster is opinionated and provides tools that:
+- **Enforce structure:** Bronze → Silver → Gold layers ensure clean dependencies.
+- **Streamline workflows:** The CLI simplifies common pipeline operations.
+- **Improve maintainability:** Guided practices reduce cognitive load.
+- **Enhance quality:** Early and automated checks prevent downstream errors.
+
+## Key Features
+
+- **Medallion Architecture Enforcement**: Built-in enforcement of the Bronze, Silver, and Gold data layers.
+- **Dependency Management**: Intelligent handling of asset dependencies ensures consistency.
+- **CLI Tools for Simplicity**: Commands are designed to reduce manual effort and guide best practices.
+- **Production-Ready by Default**: Focused on creating pipelines that are robust and production-quality from the start.
 
 ---
 
-## 🎉 ASCENSION COMPLETE!
+## Understanding Medallion Architecture
 
-You've mastered the art of data empire construction. Polster transforms you from data peasant to imperial overlord.
+Medallion Architecture is central to Polster’s design. It structures data processing into three layers:
 
-**Your conquest of data chaos begins now.**
+### Bronze Layer: Raw Data
+- **Purpose:** Ingest and store raw data without transformation.
+- **Sources:** APIs, databases, files, streams.
+- **Role:** Act as the foundation for downstream transformations, preserving original fidelity for auditing.
 
-**What empire will you build first?** 🚀
+### Silver Layer: Cleaned and Validated Data
+- **Purpose:** Apply quality checks such as schema validation and deduplication, and standardize formats.
+- **Dependencies:** Multiple bronze sources.
+- **Role:** Act as a convergence point to produce trusted datasets for analysis.
+
+### Gold Layer: Aggregated and Enriched Data
+- **Purpose:** Aggregate data into business-level metrics, analytics, and dashboards.
+- **Dependencies:** Multiple silver sources.
+- **Role:** Generate insights ready for decision-making workflows.
+
+Polster ensures these layers are followed, preventing architecture drift and guaranteeing lineage clarity.
 
 ---
 
-*Forged with 🔥 for those who refuse to accept data engineering mediocrity*
+## Getting Started with Polster
 
-*Polster CLI v0.1.0 - Your Galactic Data Empire Awaits!* 👑✨
+### Installation
 
----
-
-## 📦 INSTALLATION DOMINATION
+Install Polster via pip:
 
 ```bash
-# Conquer installation in seconds!
 pip install polster
-
-# Or forge from source
-git clone https://github.com/sultanaltair96/polster-cli-grok
-cd polster-cli-grok
-pip install -e ".[dev]"
 ```
 
-**Imperial Requirements:**
-- Python 3.12+ battle armor
-- Internet connection for initial conquest
+Or clone the repository to work with the latest version:
+
+```bash
+git clone https://github.com/sultanaltair96/polster-cli-grok
+cd polster-cli-grok
+pip install -e "[dev]"
+```
+
+### Initialize a New Project
+
+Create a new data project with a single command:
+
+```bash
+polster init my_project
+```
+
+### Example Pipeline Workflow
+
+Navigate to your project folder and execute the following examples to explore each Medallion layer:
+
+```bash
+cd my_project
+
+# Ingest raw data into the Bronze layer
+python src/core/bronze_example.py
+
+# Apply transformations and validations for the Silver layer
+python src/core/silver_example.py
+
+# Aggregate data for business intelligence in the Gold layer
+python src/core/gold_example.py
+```
+
+### Launch the Polster Dashboard
+
+Polster comes with a built-in monitoring and orchestration dashboard:
+
+```bash
+python run_polster.py --ui
+```
 
 ---
 
-## 🛠️ DEVELOPMENT FORGE
+## What Polster Is Not
 
-```bash
-# Clone the imperial repository
-git clone https://github.com/sultanaltair96/polster-cli-grok
-cd polster-cli-grok
+Polster is not:
+- **A low-code tool**: It’s designed for Python users who need full control over transformation logic.
+- **A generic orchestrator**: It enforces Medallion Architecture principles.
+- **Notebook-first**: Focus is on production-ready scripts rather than experimentation.
+- **An all-in-one analytics tool**: It specializes in building data pipelines, leaving analysis to other layers.
 
-# Install development weaponry
-pip install -e ".[dev]"
+Polster focuses on being a reliable framework for creating structured, maintainable data workflows.
 
-# Test the armaments
-pytest
+---
 
-# Forge the code
-ruff format .
-ruff check .
-```
+## Contributing
 
-## 🤝 IMPERIAL CONTRIBUTIONS
+We welcome contributions! Whether it’s reporting a bug, requesting a feature, or improving documentation, please check out our [GitHub repository](https://github.com/sultanaltair96/polster-cli-grok) to get involved.
 
-**Battle Reports & Feature Requests:**
-- Bug conquests: [GitHub Issues](https://github.com/sultanaltair96/polster-cli-grok/issues)
-- Strategic enhancements: GitHub Discussions
-- Code reinforcements: Pull Requests
+---
 
-**Imperial Development Doctrine:**
-- Python 3.12+ minimum battle standard
-- Test coverage required for new territories
-- Ruff for code supremacy
-- Comprehensive intelligence documentation
+## License
 
-## 📄 IMPERIAL LICENSE
-
-MIT License - examine [LICENSE](LICENSE) for dominion details.
+Polster is released under the MIT License. See the [LICENSE](LICENSE) file for more details.
