@@ -426,6 +426,54 @@ def add_asset(
     copy_template_file(core_template, core_file, replacements)
     copy_template_file(orch_template, orch_file, replacements)
 
+    # Update the assets/{layer}/__init__.py to include the new asset
+    init_file = (
+        project_path / "src" / "orchestration" / "assets" / layer / "__init__.py"
+    )
+    if init_file.exists():
+        content = init_file.read_text()
+        asset_function_name = f"run_{layer}_{asset_name}"
+
+        # Add import if not already present
+        import_line = f"from . import {asset_function_name}"
+        if import_line not in content:
+            # Find where to insert - after the last import
+            lines = content.splitlines()
+            insert_idx = -1
+            for i, line in enumerate(lines):
+                if line.startswith("from . import"):
+                    insert_idx = i + 1
+            if insert_idx > 0:
+                lines.insert(insert_idx, import_line)
+                content = "\n".join(lines) + "\n"
+
+        # Update __all__ if it exists
+        if "__all__" in content:
+            # Find __all__ and add the new name
+            lines = content.splitlines()
+            for i, line in enumerate(lines):
+                if line.strip().startswith("__all__"):
+                    # Parse the __all__ list
+                    all_start = lines[i].find("[")
+                    if all_start != -1:
+                        all_end = lines[i].find("]", all_start)
+                        if all_end != -1:
+                            current_all = lines[i][all_start : all_end + 1]
+                            # Add the new name if not present
+                            if f'"{asset_function_name}"' not in current_all:
+                                # Remove closing ] and add
+                                updated_all = (
+                                    current_all[:-1]
+                                    + f', "{asset_function_name}"'
+                                    + current_all[-1:]
+                                )
+                                lines[i] = lines[i].replace(current_all, updated_all)
+                                content = "\n".join(lines) + "\n"
+                    break
+
+        init_file.write_text(content)
+        rprint(f"[green]✓[/green] Updated: {init_file.relative_to(project_path)}")
+
     rprint(f"[green]✓[/green] Created core file: {core_file.relative_to(project_path)}")
     rprint(
         f"[green]✓[/green] Created orchestration file: {orch_file.relative_to(project_path)}"
