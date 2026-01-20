@@ -94,6 +94,116 @@ def get_existing_assets(layer: str, project_path: Path) -> list[str]:
     return sorted(assets)
 
 
+def get_assets_in_layer(layer: str, project_path: Path) -> list[dict]:
+    """Get existing assets in a specific layer with metadata."""
+    assets = []
+    assets_dir = project_path / "src" / "orchestration" / "assets" / layer
+
+    if not assets_dir.exists():
+        return assets
+
+    # Get all asset files in the layer
+    for asset_file in assets_dir.glob("*.py"):
+        if asset_file.name.startswith(f"run_{layer}_") and asset_file.name.endswith(
+            ".py"
+        ):
+            asset_name = asset_file.name[
+                len(f"run_{layer}_") : -3
+            ]  # Remove prefix and .py
+
+            # Try to get description from the asset file
+            description = f"{layer.title()} asset for {asset_name}"
+            try:
+                content = asset_file.read_text()
+                # Look for description in the @asset decorator
+                for line in content.splitlines():
+                    if 'description="' in line or "description='" in line:
+                        # Extract description from the line
+                        desc_match = re.search(r'description=["\']([^"\']+)["\']', line)
+                        if desc_match:
+                            description = desc_match.group(1)
+                            break
+            except Exception:
+                pass
+
+            # Count dependencies by checking the deps parameter
+            dep_count = 0
+            try:
+                content = asset_file.read_text()
+                if "deps=[" in content or "deps=" in content:
+                    # Simple count - could be improved with proper parsing
+                    dep_count = content.count("run_")
+            except Exception:
+                pass
+
+            assets.append(
+                {
+                    "name": asset_name,
+                    "full_name": f"run_{layer}_{asset_name}",
+                    "description": description,
+                    "dep_count": dep_count,
+                    "file_path": asset_file,
+                }
+            )
+
+    return sorted(assets, key=lambda x: x["name"])
+
+
+def parse_asset_selection(choice: str, max_index: int) -> list[int]:
+    """Parse asset selection with comma-separated numbers and ranges like '1,3-5,7'."""
+    if choice.lower() == "all":
+        return list(range(1, max_index + 1))
+
+    indices = []
+    try:
+        for part in choice.split(","):
+            part = part.strip()
+            if "-" in part:
+                # Handle ranges: "3-5" -> [3,4,5]
+                start, end = map(int, part.split("-"))
+                if start > end:
+                    start, end = end, start  # Allow reverse ranges
+                indices.extend(range(start, end + 1))
+            else:
+                # Handle single numbers: "1" -> [1]
+                indices.append(int(part))
+
+        # Validate indices are in range and remove duplicates
+        indices = sorted(set(i for i in indices if 1 <= i <= max_index))
+        return indices
+    except (ValueError, TypeError):
+        return []  # Invalid selection
+
+
+def check_asset_dependencies(
+    asset_name: str, layer: str, project_path: Path
+) -> list[str]:
+    """Check which assets depend on the given asset."""
+    dependent_assets = []
+    all_layers = ["bronze", "silver", "gold"]
+
+    for check_layer in all_layers:
+        if check_layer == layer:
+            continue  # Don't check within the same layer
+
+        assets_dir = project_path / "src" / "orchestration" / "assets" / check_layer
+        if not assets_dir.exists():
+            continue
+
+        for asset_file in assets_dir.glob("*.py"):
+            try:
+                content = asset_file.read_text()
+                # Look for the asset name in deps
+                if f"run_{layer}_{asset_name}" in content:
+                    # Extract the asset name from filename
+                    file_asset_name = asset_file.name[len(f"run_{check_layer}_") : -3]
+                    dependent_assets.append(f"{check_layer}_{file_asset_name}")
+            except Exception:
+                continue
+
+    return dependent_assets
+
+
 def run_command(cmd: list[str], cwd: Path | None = None) -> bool:
     """Run a command and return success status."""
     try:
@@ -574,6 +684,174 @@ def add_asset(
     rprint("2. Uncomment the example code to test")
     rprint("3. Run 'python run_polster.py --ui' to see your asset in the UI")
     rprint("4. Your new asset will appear automatically in the Dagster interface")
+
+
+@app.command()
+def remove_asset(
+    layer: str = typer.Option(None, "--layer", help="Layer (bronze/silver/gold)"),
+    name: str = typer.Option(None, "--name", help="Asset name (snake_case)"),
+    dry_run: bool = typer.Option(
+        False, "--dry-run", help="Preview what would be removed without deleting"
+    ),
+    force: bool = typer.Option(
+        False, "--force", help="Skip confirmations and dependency checks"
+    ),
+) -> None:
+    """Remove an asset from the current Polster project."""
+    # Ensure we're in a valid project
+    project_path = ensure_polster_project()
+
+    rprint("[bold]Removing asset from Polster project[/bold]")
+
+    # Handle layer selection
+    if layer:
+        layer = layer.lower()
+        if layer not in ["bronze", "silver", "gold"]:
+            rprint("[red]Layer must be one of: bronze, silver, gold[/red]")
+            raise typer.Exit(1)
+    else:
+        layer = Prompt.ask(
+            "Which layer?",
+            choices=["bronze", "silver", "gold"],
+            case_sensitive=False,
+        ).lower()
+
+    # Get available assets in the layer
+    available_assets = get_assets_in_layer(layer, project_path)
+
+    if not available_assets:
+        rprint(f"[yellow]No assets found in {layer} layer[/yellow]")
+        return
+
+    # Handle asset selection
+    selected_assets = []
+    if name:
+        # Direct selection by name
+        name = validate_asset_name(name)
+        matching_assets = [a for a in available_assets if a["name"] == name]
+        if not matching_assets:
+            rprint(f"[red]Asset '{name}' not found in {layer} layer[/red]")
+            raise typer.Exit(1)
+        selected_assets = matching_assets
+    else:
+        # Interactive selection
+        rprint(f"\n[bold]Available {layer} assets:[/bold]")
+        for i, asset in enumerate(available_assets, 1):
+            dep_info = f" ({asset['dep_count']} deps)" if asset["dep_count"] > 0 else ""
+            rprint(f"{i}. {asset['name']} - {asset['description']}{dep_info}")
+
+        choice = Prompt.ask(
+            "\nSelect assets to remove (numbers/ranges, comma-separated, or 'all')",
+            default="",
+        ).strip()
+
+        if not choice:
+            rprint("[yellow]No selection made. Aborting.[/yellow]")
+            return
+
+        # Parse the selection
+        indices = parse_asset_selection(choice, len(available_assets))
+        if not indices:
+            rprint(
+                "[red]Invalid selection. Please use numbers, ranges (1-3), or 'all'[/red]"
+            )
+            return
+
+        selected_assets = [available_assets[i - 1] for i in indices]
+
+    if not selected_assets:
+        rprint("[yellow]No valid assets selected[/yellow]")
+        return
+
+    # Check dependencies for all selected assets
+    all_dependent_assets = []
+    for asset in selected_assets:
+        dependents = check_asset_dependencies(asset["name"], layer, project_path)
+        all_dependent_assets.extend(dependents)
+
+    all_dependent_assets = list(set(all_dependent_assets))  # Remove duplicates
+
+    # Show impact analysis
+    rprint(f"\n[bold]Selection Summary:[/bold]")
+    rprint(f"- {len(selected_assets)} asset(s) selected for removal")
+    if all_dependent_assets:
+        rprint(
+            f"- {len(all_dependent_assets)} downstream dependency(ies) will be broken"
+        )
+    else:
+        rprint("- No downstream dependencies detected")
+
+    # Show files that will be removed
+    rprint(f"\n[bold]Files to remove:[/bold]")
+    files_to_remove = []
+    for asset in selected_assets:
+        core_file = project_path / "src" / "core" / f"{layer}_{asset['name']}.py"
+        orch_file = asset["file_path"]
+
+        if core_file.exists():
+            rprint(f"  - {core_file.relative_to(project_path)}")
+            files_to_remove.append(core_file)
+        if orch_file.exists():
+            rprint(f"  - {orch_file.relative_to(project_path)}")
+            files_to_remove.append(orch_file)
+
+    if dry_run:
+        rprint("\n[yellow]DRY RUN: No files will be removed[/yellow]")
+        return
+
+    # Safety checks
+    if not force:
+        # Block if there are dependencies
+        if all_dependent_assets:
+            rprint(
+                f"\n[red]⚠️  Cannot remove: {len(all_dependent_assets)} asset(s) depend on selected asset(s):[/red]"
+            )
+            for dep in all_dependent_assets:
+                rprint(f"  - {dep}")
+            rprint("[red]Use --force to override this safety check[/red]")
+            return
+
+        # Special confirmation for "all" or high-impact removals
+        if len(selected_assets) > 3:
+            confirm_text = Prompt.ask(
+                f"HIGH IMPACT: Removing {len(selected_assets)} assets. Type 'CONFIRM' to proceed",
+                default="",
+            )
+            if confirm_text != "CONFIRM":
+                rprint("[red]Confirmation failed. Aborting removal.[/red]")
+                return
+
+    # Final confirmation
+    if not force:
+        confirm = Confirm.ask(
+            f"\nRemove {len(selected_assets)} asset(s) and {len(files_to_remove)} file(s)?",
+            default=False,
+        )
+        if not confirm:
+            rprint("[yellow]Removal cancelled[/yellow]")
+            return
+
+    # Perform removal
+    removed_count = 0
+    for file_path in files_to_remove:
+        try:
+            file_path.unlink()
+            removed_count += 1
+            rprint(f"✅ Removed {file_path.relative_to(project_path)}")
+        except Exception as e:
+            rprint(
+                f"[red]Failed to remove {file_path.relative_to(project_path)}: {e}[/red]"
+            )
+
+    if removed_count > 0:
+        rprint(
+            f"\n[green]Successfully removed {len(selected_assets)} asset(s) and {removed_count} file(s)[/green]"
+        )
+        rprint(
+            "[yellow]Note: Restart Dagster UI if running to see changes take effect[/yellow]"
+        )
+    else:
+        rprint("[yellow]No files were removed[/yellow]")
 
 
 if __name__ == "__main__":
