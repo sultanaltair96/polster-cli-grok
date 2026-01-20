@@ -9,16 +9,16 @@ from dagster import (
     Definitions,
     ScheduleDefinition,
     define_asset_job,
-    load_assets_from_package,
+    load_assets_from_package_name,
 )
 
 # Import asset modules
 from .assets import bronze, gold, silver
 
 # Automatically load all assets from each layer
-bronze_assets = load_assets_from_package(bronze)
-silver_assets = load_assets_from_package(silver)
-gold_assets = load_assets_from_package(gold)
+bronze_assets = load_assets_from_package_name("src.orchestration.assets.bronze")
+silver_assets = load_assets_from_package_name("src.orchestration.assets.silver")
+gold_assets = load_assets_from_package_name("src.orchestration.assets.gold")
 
 print(f"DEBUG: bronze_assets: {len(bronze_assets)}")
 print(f"DEBUG: silver_assets: {len(silver_assets)}")
