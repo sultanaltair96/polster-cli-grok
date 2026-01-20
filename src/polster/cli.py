@@ -352,6 +352,7 @@ def init(
             rprint(f"  cd ../{project_name}")
             rprint(f"  source {activation_cmd}")
             rprint("  dagster dev")
+            rprint("  # Or use: python run_dagster.py")
         else:
             # Fallback when virtual environment setup failed
             rprint("\nTo get started:")

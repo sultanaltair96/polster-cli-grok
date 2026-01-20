@@ -1,23 +1,46 @@
-"""Dagster runner for {{PROJECT_NAME}}."""
+"""Script to run Dagster with a stable, portable home directory."""
 
 import os
+import pathlib
+import subprocess
 import sys
 
-if __name__ == "__main__":
-    # Add src directory to Python path for proper imports
-    src_path = os.path.join(os.getcwd(), "src")
-    if src_path not in sys.path:
-        sys.path.insert(0, src_path)
 
-    # Set DAGSTER_HOME to project-local directory
-    dagster_home = os.path.join(os.getcwd(), ".dagster")
-    os.environ["DAGSTER_HOME"] = dagster_home
+def find_project_root(start: pathlib.Path) -> pathlib.Path:
+    """Walk up directories until a pyproject.toml is found."""
+    for candidate in (start, *start.parents):
+        if (candidate / "pyproject.toml").exists():
+            return candidate
+    raise FileNotFoundError("pyproject.toml not found above run_dagster.py")
 
-    # Ensure DAGSTER_HOME directory exists
-    os.makedirs(dagster_home, exist_ok=True)
 
-    # Run Dagster with default command line arguments
-    from dagster import cli
+def build_env(root: pathlib.Path) -> dict[str, str]:
+    dagster_home = root / ".dagster"
+    dagster_home.mkdir(exist_ok=True)
 
-    sys.argv[0] = "dagster"  # Make dagster think it's being called normally
-    cli.main()
+    env = os.environ.copy()
+    env["DAGSTER_HOME"] = str(dagster_home)
+
+    pythonpath = str(root / "src")
+    if "PYTHONPATH" in env:
+        env["PYTHONPATH"] = pythonpath + ":" + env["PYTHONPATH"]
+    else:
+        env["PYTHONPATH"] = pythonpath
+
+    return env
+
+
+SCRIPT_PATH = pathlib.Path(__file__).resolve()
+ROOT = find_project_root(SCRIPT_PATH.parent)
+ENV = build_env(ROOT)
+
+cmd = [
+    "dagster",
+    "asset",
+    "materialize",
+    "-m",
+    "orchestration.definitions",
+    "--select",
+    "*",
+]
+sys.exit(subprocess.call(cmd, cwd=ROOT, env=ENV))
