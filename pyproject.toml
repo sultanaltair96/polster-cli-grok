@@ -54,6 +54,9 @@ include = [
 [tool.ruff]
 line-length = 88
 target-version = "py313"
+exclude = [
+    "src/polster/templates/**/*.py",
+]
 
 [tool.ruff.lint]
 select = ["E", "F", "W", "I", "B", "C4", "UP"]

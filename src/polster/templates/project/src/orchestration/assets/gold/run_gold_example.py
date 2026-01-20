@@ -1,6 +1,6 @@
 """Gold example asset."""
 
-from dagster import asset, AutomationCondition
+from dagster import AutomationCondition, asset
 
 from src.core.gold_example import aggregate
 from src.orchestration.utils import create_output_with_metadata

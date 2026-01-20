@@ -6,23 +6,21 @@ This file demonstrates how to extract data and write it to the bronze layer.
 from __future__ import annotations
 
 import random
-from datetime import datetime, timezone
+from datetime import datetime
 
 import polars as pl
 from faker import Faker
 
 try:
     # Try relative imports (when run as module through Dagster)
-    from .paths import PROJECT_ROOT, DATA_DIR, BRONZE_DIR, SILVER_DIR, GOLD_DIR
     from .storage import write_parquet
 except ImportError:
     # Fall back to absolute imports (when run directly)
-    import sys
     import os
+    import sys
 
     # Add src directory to path for absolute imports
     sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
-    from core.paths import PROJECT_ROOT, DATA_DIR, BRONZE_DIR, SILVER_DIR, GOLD_DIR
     from core.storage import write_parquet
 
 
@@ -36,7 +34,7 @@ def extract() -> str:
         str: Path to the written parquet file.
     """
     customer_ids = list(range(1, 201))
-    fetch_time = datetime.now(timezone.utc).replace(microsecond=0).isoformat()
+    fetch_time = datetime.now(datetime.UTC).replace(microsecond=0).isoformat()
     orders = []
 
     for idx in range(500):
@@ -55,7 +53,7 @@ def extract() -> str:
         )
 
     df = pl.DataFrame(orders).with_columns(pl.lit(fetch_time).alias("fetched_at"))
-    timestamp = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")
+    timestamp = datetime.now(datetime.UTC).strftime("%Y%m%dT%H%M%SZ")
     return write_parquet(df, "bronze", f"bronze_orders_{timestamp}.parquet")
 
 

@@ -5,11 +5,11 @@ assets with eager materialization for silver and gold layers.
 """
 
 from dagster import (
-    Definitions,
-    load_assets_from_modules,
-    define_asset_job,
-    ScheduleDefinition,
     AssetSelection,
+    Definitions,
+    ScheduleDefinition,
+    define_asset_job,
+    load_assets_from_modules,
 )
 
 # Conditionally import asset modules

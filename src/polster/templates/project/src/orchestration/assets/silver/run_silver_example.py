@@ -1,6 +1,6 @@
 """Silver example asset."""
 
-from dagster import asset, AutomationCondition
+from dagster import AutomationCondition, asset
 
 from src.core.silver_example import transform
 from src.orchestration.utils import create_output_with_metadata

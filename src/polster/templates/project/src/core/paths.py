@@ -1,7 +1,6 @@
 """Path utilities for Polster projects."""
 
 import os
-from pathlib import Path
 
 # Dynamically find the project root (parent of src)
 current_dir = os.path.dirname(__file__)

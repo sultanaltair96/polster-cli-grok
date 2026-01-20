@@ -7,7 +7,6 @@ import shutil
 import subprocess
 import sys
 from pathlib import Path
-from typing import Any
 
 import typer
 from rich import print as rprint
@@ -84,9 +83,7 @@ def generate_setup_commands(project_name: str, project_path: Path) -> tuple[str,
 def run_command(cmd: list[str], cwd: Path | None = None) -> bool:
     """Run a command and return success status."""
     try:
-        result = subprocess.run(
-            cmd, cwd=cwd, capture_output=True, text=True, check=True
-        )
+        subprocess.run(cmd, cwd=cwd, capture_output=True, text=True, check=True)
         return True
     except subprocess.CalledProcessError as e:
         rprint(f"[red]Command failed: {' '.join(cmd)}[/red]")
@@ -346,7 +343,7 @@ def init(
             rprint("  dagster dev")
         else:
             # Fallback when virtual environment setup failed
-            rprint(f"\nTo get started:")
+            rprint("\nTo get started:")
             rprint(f"  cd ../{project_name}")
             rprint("  # Set up virtual environment and run dagster dev")
 
@@ -409,7 +406,7 @@ def add_asset(
         raise typer.Exit(1)
 
     if dry_run:
-        rprint(f"[bold]Dry run - would create:[/bold]")
+        rprint("[bold]Dry run - would create:[/bold]")
         rprint(f"  Core file: {core_file.relative_to(project_path)}")
         rprint(f"  Orchestration file: {orch_file.relative_to(project_path)}")
         return

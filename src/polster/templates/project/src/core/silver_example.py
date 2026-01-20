@@ -5,22 +5,20 @@ This file demonstrates how to transform bronze data and write it to the silver l
 
 from __future__ import annotations
 
-from datetime import datetime, timezone
+from datetime import datetime
 
 import polars as pl
 
 try:
     # Try relative imports (when run as module through Dagster)
-    from .paths import PROJECT_ROOT, DATA_DIR, BRONZE_DIR, SILVER_DIR, GOLD_DIR
     from .storage import read_parquet_latest, write_parquet
 except ImportError:
     # Fall back to absolute imports (when run directly)
-    import sys
     import os
+    import sys
 
     # Add src directory to path for absolute imports
     sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
-    from core.paths import PROJECT_ROOT, DATA_DIR, BRONZE_DIR, SILVER_DIR, GOLD_DIR
     from core.storage import read_parquet_latest, write_parquet
 
 
@@ -46,10 +44,10 @@ def transform() -> str:
     )
 
     # Add transformation timestamp
-    transform_time = datetime.now(timezone.utc).replace(microsecond=0).isoformat()
+    transform_time = datetime.now(datetime.UTC).replace(microsecond=0).isoformat()
     cleaned = cleaned.with_columns(pl.lit(transform_time).alias("transformed_at"))
 
-    timestamp = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")
+    timestamp = datetime.now(datetime.UTC).strftime("%Y%m%dT%H%M%SZ")
     return write_parquet(cleaned, "silver", f"silver_orders_{timestamp}.parquet")
 
 

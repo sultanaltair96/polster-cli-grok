@@ -2,3 +2,5 @@
 
 # Import asset modules
 from . import run_gold_example
+
+__all__ = ["run_gold_example"]

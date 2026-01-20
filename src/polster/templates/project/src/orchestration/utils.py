@@ -1,9 +1,11 @@
 """Utilities for Dagster orchestration."""
 
-from typing import Any, Dict
+from typing import Any
 
 
-def create_output_with_metadata(path: str, extra_metadata: Dict[str, Any] | None = None) -> Dict[str, Any]:
+def create_output_with_metadata(
+    path: str, extra_metadata: dict[str, Any] | None = None
+) -> dict[str, Any]:
     """Create output with metadata for Dagster assets.
 
     Args:
