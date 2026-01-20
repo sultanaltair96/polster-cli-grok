@@ -13,7 +13,7 @@ from dagster import (
 )
 
 # Import asset modules
-from orchestration.assets import bronze, gold, silver
+from .assets import bronze, gold, silver
 
 # Automatically load all assets from each layer
 bronze_assets = load_assets_from_modules([bronze], group_name="bronze")
