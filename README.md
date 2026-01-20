@@ -12,6 +12,27 @@ This isn't improvement. This is the complete reinvention of data engineering.
 
 Welcome to the data factory revolution.
 
+## 🎯 POLSTER VS GENERIC ORCHESTRATORS
+
+Polster is **Dagster with opinions turned into laws**:
+
+| Generic Dagster | Polster (Opinionated) |
+|-----------------|----------------------|
+| "You can structure however you want" | Bronze → Silver → Gold enforced |
+| Manual dependency declaration | Interactive dependency selection |
+| Flexible but error-prone | Guided toward best practices |
+| Production patterns optional | Production patterns default |
+
+## ❌ WHAT POLSTER IS NOT
+
+**Not a low-code drag-and-drop tool** - you write Python code for transformations
+**Not a generic orchestrator** - medallion architecture and dependency rules are enforced
+**Not notebook-first** - production-ready scripts are the default, not experiments
+**Not a replacement for SQL modeling tools** - focuses on Python data pipelines
+**Not trying to be everything** - specializes in opinionated data factories
+
+Polster knows its boundaries. This focus enables the opinionated design that makes it powerful.
+
 ---
 
 
@@ -51,24 +72,51 @@ This used to require armies of engineers. Now it's a lunch break.
 Medallion architecture isn't optional - it's fundamental mathematics. Like gravity, it cannot be ignored.
 
 **BRONZE LAYER: RAW RESOURCE EXTRACTION** ⛰️
-- Unfiltered, unprocessed, unapologetic data streams
-- APIs, databases, files, streams - all preserved exactly as received
-- No transformations (yet) - maintain audit trails and original fidelity
-- Fan-out foundation: Multiple sources feed the empire
+- **What it creates:** Python scripts that ingest data without transformation
+- **Data sources:** APIs, databases, files, streams - all preserved exactly as received
+- **Purpose:** Maintain audit trails and original fidelity for compliance
+- **Architecture role:** Fan-out foundation - multiple sources feed the pipeline
 
 **SILVER LAYER: INDUSTRIAL REFINING** ⚙️
-- Data cleaning, validation, standardization, business logic
-- Depends ONLY on bronze (physics demands it)
-- Quality gates, error correction, consistency enforcement
-- Convergence point: Multiple bronzes become unified datasets
+- **What it creates:** Python assets with schema validation and data cleaning logic
+- **Dependencies:** Multiple bronze assets allowed (enforced by CLI)
+- **Purpose:** Quality gates, error correction, business rule standardization
+- **Architecture role:** Convergence point - multiple bronzes become unified datasets
 
 **GOLD LAYER: WEAPONIZED INTELLIGENCE** 🏆
-- Business analytics, ML features, executive dashboards
-- Depends ONLY on silver (no raw material shortcuts!)
-- Revenue-driving insights, predictive models, strategic decisions
-- Convergence summit: Silver intelligence becomes competitive dominance
+- **What it creates:** Python assets with aggregations and business metrics
+- **Dependencies:** Multiple silver assets allowed (bronze forbidden)
+- **Purpose:** Revenue-driving insights, ML features, executive dashboards
+- **Architecture role:** Business value convergence - silver becomes competitive advantage
 
 **WHY THIS WORKS:** Dependencies MUST converge upward. Raw ore can't become weapons-grade alloy without refining. Polster enforces this law of data physics automatically.
+
+## 💡 REAL-WORLD EXAMPLE: E-COMMERCE ANALYTICS PIPELINE
+
+**Bronze: Raw Orders API** → `bronze_orders.py`
+```python
+# Ingests raw API data without transformation
+# Input: {"order_id": 123, "customer": "alice", "amount": 99.99, "timestamp": "2024-01-01"}
+# Stores exactly as received (audit trail preserved)
+```
+
+**Silver: Cleaned Customer Data** → `silver_customers.py`
+```python
+# Depends on: bronze_orders
+# Validates schemas, removes duplicates, standardizes customer names
+# Applies business rules: active customers only, valid email formats
+# Output: Clean customer dimension table
+```
+
+**Gold: Revenue Analytics** → `gold_revenue.py`
+```python
+# Depends on: silver_customers
+# Calculates: total revenue, customer lifetime value, monthly trends
+# Generates: executive dashboard data, business KPIs
+# Output: Revenue insights ready for dashboards and reports
+```
+
+**Result:** Automated pipeline that turns messy API data into business intelligence. Dependencies converge naturally, quality is enforced at each layer, and the entire flow runs automatically.
 
 ## 🚀 ASSET DOMINATION: INTELLIGENT DEPENDENCY CONQUEST
 
