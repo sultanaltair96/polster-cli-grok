@@ -435,17 +435,16 @@ def add_asset(
         asset_function_name = f"run_{layer}_{asset_name}"
 
         # Add import if not already present
-        import_line = f"from . import {asset_function_name}"
-        if import_line not in content:
-            # Find where to insert - after the last import
-            lines = content.splitlines()
-            insert_idx = -1
-            for i, line in enumerate(lines):
-                if line.startswith("from . import"):
-                    insert_idx = i + 1
-            if insert_idx > 0:
-                lines.insert(insert_idx, import_line)
-                content = "\n".join(lines) + "\n"
+        import_block = f"""try:
+    from . import {asset_function_name}
+except ImportError:
+    pass"""
+        if f"from . import {asset_function_name}" not in content:
+            # Insert before __all__ or at end
+            if "__all__" in content:
+                content = content.replace("__all__", import_block + "\n\n__all__", 1)
+            else:
+                content += f"\n{import_block}\n"
 
         # Update __all__ if it exists
         if "__all__" in content:
