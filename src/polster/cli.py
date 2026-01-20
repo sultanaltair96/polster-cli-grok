@@ -437,13 +437,14 @@ def add_asset(
     copy_template_file(core_template, core_file, replacements)
     copy_template_file(orch_template, orch_file, replacements)
 
+    asset_function_name = f"run_{layer}_{asset_name}"
+
     # Update the assets/{layer}/__init__.py to include the new asset
     init_file = (
         project_path / "src" / "orchestration" / "assets" / layer / "__init__.py"
     )
     if init_file.exists():
         content = init_file.read_text()
-        asset_function_name = f"run_{layer}_{asset_name}"
 
         # Add import if not already present
         import_block = f"""try:
@@ -483,6 +484,32 @@ except ImportError:
 
         init_file.write_text(content)
         rprint(f"[green]✓[/green] Updated: {init_file.relative_to(project_path)}")
+
+    # Update definitions.py to include the new asset
+    defs_file = project_path / "src" / "orchestration" / "definitions.py"
+    if defs_file.exists():
+        content = defs_file.read_text()
+        modules_var = f"{layer}_modules"
+        import_line = f"    from .assets.{layer} import {asset_function_name}"
+        append_line = f"    {modules_var}.append({asset_function_name})"
+
+        # Find the existing try block for this layer's example
+        example_name = f"run_{layer}_example"
+        example_import = f"    from .assets.{layer} import {example_name}"
+        example_append = f"    {modules_var}.append({example_name})"
+
+        if example_import in content and example_append in content:
+            # Insert after the example's append
+            insert_after = example_append
+            insert_text = f"""\ntry:
+{import_line}
+{append_line}
+except ImportError:
+    pass"""
+            content = content.replace(insert_after, insert_after + insert_text)
+
+        defs_file.write_text(content)
+        rprint(f"[green]✓[/green] Updated: {defs_file.relative_to(project_path)}")
 
     rprint(f"[green]✓[/green] Created core file: {core_file.relative_to(project_path)}")
     rprint(
