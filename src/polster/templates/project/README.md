@@ -8,8 +8,8 @@ A Polster data orchestration project.
 # Activate virtual environment
 source .venv/bin/activate  # or `.venv\Scripts\activate` on Windows
 
-# Start Dagster UI
-dagster dev
+# Start Dagster UI (materializes assets automatically)
+python run_dagster.py --ui
 ```
 
 ## Project Structure
@@ -84,12 +84,15 @@ ruff check .
 ## Dagster Commands
 
 ```bash
-# Start UI
-dagster dev
+# Start UI (recommended - includes automatic materialization)
+python run_dagster.py --ui
 
-# Materialize specific asset
-dagster asset materialize --select run_bronze_example
+# Materialize all assets only
+python run_dagster.py
 
-# Materialize all assets in a layer
-dagster asset materialize --select "*bronze*"
+# Start UI without materialization
+python run_dagster.py --no-materialize --ui
+
+# Alternative: Materialize specific assets manually
+# (Use run_dagster.py for most operations)
 ```
