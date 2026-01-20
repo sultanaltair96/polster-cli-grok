@@ -20,8 +20,14 @@ bronze_assets = load_assets_from_modules([bronze], group_name="bronze")
 silver_assets = load_assets_from_modules([silver], group_name="silver")
 gold_assets = load_assets_from_modules([gold], group_name="gold")
 
+print(f"DEBUG: bronze_assets: {len(bronze_assets)}")
+print(f"DEBUG: silver_assets: {len(silver_assets)}")
+print(f"DEBUG: gold_assets: {len(gold_assets)}")
+
 # Combine all assets
 all_assets = [*bronze_assets, *silver_assets, *gold_assets]
+
+print(f"DEBUG: total assets: {len(all_assets)}")
 
 # Define a job for all bronze assets
 bronze_job = define_asset_job("bronze_job", selection=AssetSelection.groups("bronze"))
