@@ -71,10 +71,10 @@ def generate_setup_commands(project_name: str, project_path: Path) -> tuple[str,
     is_windows = platform.system() == "Windows"
 
     if is_windows:
-        activation_cmd = f"{project_name}\\.venv\\Scripts\\activate"
+        activation_cmd = ".venv\\Scripts\\activate"
         quick_cmd = f"cd ..\\{project_name} && {activation_cmd} && dagster dev"
     else:
-        activation_cmd = f"{project_name}/.venv/bin/activate"
+        activation_cmd = ".venv/bin/activate"
         quick_cmd = f"cd ../{project_name} && source {activation_cmd} && dagster dev"
 
     return activation_cmd, quick_cmd
