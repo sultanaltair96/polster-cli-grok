@@ -49,10 +49,15 @@ That's Polster - your personal data factory builder! 🏭✨
 
 ## **⚡ Your First Data Factory (5 Minutes!)**
 
+
 ```bash
 # 🎬 Scene: Building Your Sales Analytics Factory
 
 # Step 1: Create your factory blueprint
+git clone https://github.com/sultanaltair96/polster-cli-grok
+cd polster-cli-grok
+pip install -e ".[dev]"
+
 polster init sales_analytics
 
 # Step 2: Explore your new factory
