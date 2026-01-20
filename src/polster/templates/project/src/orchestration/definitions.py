@@ -16,9 +16,9 @@ from dagster import (
 from .assets import bronze, gold, silver
 
 # Automatically load all assets from each layer
-bronze_assets = load_assets_from_modules([bronze], group_name="bronze")
-silver_assets = load_assets_from_modules([silver], group_name="silver")
-gold_assets = load_assets_from_modules([gold], group_name="gold")
+bronze_assets = load_assets_from_modules([bronze])
+silver_assets = load_assets_from_modules([silver])
+gold_assets = load_assets_from_modules([gold])
 
 print(f"DEBUG: bronze_assets: {len(bronze_assets)}")
 print(f"DEBUG: silver_assets: {len(silver_assets)}")
