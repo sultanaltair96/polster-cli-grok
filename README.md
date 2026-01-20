@@ -1,141 +1,347 @@
-# Polster: A Professional Framework for Data Engineering
+# Polster
 
-Polster is an open-source, Python-based framework designed to simplify ETL processes and data pipeline orchestration. With an opinionated approach grounded in the Medallion Architecture, Polster provides teams with a structured, reproducible, and reliable way to build scalable data workflows.
+[![PyPI version](https://badge.fury.io/py/polster.svg)](https://pypi.org/project/polster/)
+[![Python 3.12+](https://img.shields.io/badge/python-3.12+-blue.svg)](https://www.python.org/downloads/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![CI](https://github.com/sultanaltair96/polster-cli-grok/actions/workflows/ci.yml/badge.svg)](https://github.com/sultanaltair96/polster-cli-grok/actions)
+
+**Build reliable data pipelines with enforced Medallion Architecture**
+
+Polster is a CLI tool that generates production-ready Dagster projects following the Medallion Architecture pattern. It helps data engineers create scalable, maintainable ETL pipelines with proper data layering and dependency management.
+
+Whether you're new to data engineering or a seasoned architect, Polster provides the structure and tooling to build data workflows that scale.
+
+## Table of Contents
+
+- [Why Polster?](#why-polster)
+- [Key Features](#key-features)
+- [Medallion Architecture](#medallion-architecture)
+- [Installation](#installation)
+- [Quick Start](#quick-start)
+- [Examples](#examples)
+- [API Reference](#api-reference)
+- [Contributing](#contributing)
+- [License](#license)
 
 ## Why Polster?
 
-Data engineering is complex and prone to issues like:
-- **Broken dependency graphs**, leading to unmaintainable pipelines.
-- **Invisible data coupling**, making debugging and enhancements challenging.
-- **Late-stage data quality checks**, delaying error detection to production.
-- **Ad-hoc workflows**, creating inconsistency across pipelines.
+Data engineering projects often start simple but grow complex. Without structure, pipelines become:
 
-Polster solves these challenges by enforcing simple, predictable, and repeatable patterns for data workflows. It is ideal for teams looking to:
-- **Reduce maintenance overhead**: Enforced dependency rules keep systems clean.
-- **Standardize best practices**: Automatic alignment with Medallion Architecture principles.
-- **Accelerate delivery**: Easy-to-use CLI tools reduce onboarding friction.
-- **Enhance data quality**: Integrated validation ensures clean data at every stage.
+- **Hard to debug**: Unclear dependencies make tracing issues difficult
+- **Brittle**: Changes in one part break others unexpectedly  
+- **Inconsistent**: Different engineers follow different patterns
+- **Unmaintainable**: Code becomes a tangled mess over time
 
----
+Polster solves this by enforcing the Medallion Architecture - a proven pattern that organizes data transformation into logical layers. This creates:
+
+- **Clear data lineage**: Know exactly where data comes from and goes
+- **Predictable patterns**: Consistent structure across all projects
+- **Easier testing**: Isolated layers can be tested independently
+- **Better collaboration**: Everyone understands the project structure
+
+It's like having a blueprint for your data house - you know where the foundation, walls, and roof go before you start building.
 
 ## Key Features
 
-- **Medallion Architecture**: Organizes data transformation into Bronze, Silver, and Gold layers to improve consistency and quality.
-- **Dependency Management**: Automatically enforces best practices for pipeline dependencies.
-- **Command-Line Simplicity**: A robust CLI lets you manage projects, assets, and pipelines effortlessly.
-- **Production-First Design**: Designed for scalable, reproducible pipelines that work seamlessly in production environments.
+- **🛡️ Enforced Architecture**: Automatically creates Bronze → Silver → Gold layers with proper dependencies
+- **⚡ Quick Start**: Generate complete projects in seconds with `polster init`
+- **🔗 Smart Dependencies**: Interactive prompts help you connect assets correctly
+- **🐍 Python Native**: Uses familiar Python patterns with Dagster orchestration
+- **📊 Production Ready**: Includes monitoring, scheduling, and error handling
+- **🧪 Testable**: Each layer can be unit tested independently
+- **📚 Well Documented**: Clear examples and comprehensive guides
 
----
+## Medallion Architecture
 
-## Understanding Medallion Architecture
+Polster enforces the Medallion Architecture, organizing your data pipeline into three layers. Think of it like refining ore: raw material → purified metal → finished jewelry.
 
-### Bronze Layer: Raw Data
-- **Purpose**: Stores unprocessed, raw data.
-- **Examples**: Data from APIs, databases, logs, and files.
-- **Role**: Source of truth and audit trail.
+### Bronze Layer: Raw Data Ingestion
+**Purpose**: Capture raw data exactly as received
+- **Examples**: API responses, database dumps, log files, CSV exports
+- **Characteristics**: Unchanged, timestamped, auditable
+- **Tools**: Polars for fast data loading, minimal transformations
 
-### Silver Layer: Cleaned Data
-- **Purpose**: Applies validation, deduplication, and transformations.
-- **Examples**: Clean, schema-validated datasets ready for analysis.
-- **Role**: Normalizes and refines data from the Bronze layer.
+```python
+# Bronze asset example
+@asset
+def bronze_user_events():
+    """Load raw user event data from API"""
+    return pl.read_csv("raw_events.csv")
+```
 
-### Gold Layer: Business-Ready Data
-- **Purpose**: Aggregates and enriches data into actionable insights.
-- **Examples**: Metrics dashboards, machine learning features, and key reports.
-- **Role**: Generates insights that drive decision-making.
+### Silver Layer: Clean & Validated Data  
+**Purpose**: Clean, validate, and standardize data
+- **Examples**: Deduplicated records, type-validated columns, normalized formats
+- **Characteristics**: High quality, ready for analysis, business logic applied
+- **Dependencies**: Can only depend on Bronze assets
 
-Medallion Architecture ensures a clear lineage and promotes maintainability. Polster enforces rules to prevent common architectural pitfalls, such as misaligned dependencies.
+```python
+# Silver asset example  
+@asset
+def silver_clean_users(bronze_user_events):
+    """Clean and validate user data"""
+    return (
+        bronze_user_events
+        .drop_nulls()
+        .with_columns(pl.col("email").str.to_lowercase())
+    )
+```
 
----
+### Gold Layer: Business Insights
+**Purpose**: Aggregate and enrich data for business decisions
+- **Examples**: KPI dashboards, ML features, executive reports
+- **Characteristics**: Curated, aggregated, business-value focused
+- **Dependencies**: Can only depend on Silver assets
 
-## Getting Started
+```python
+# Gold asset example
+@asset  
+def gold_user_metrics(silver_clean_users):
+    """Calculate user engagement metrics"""
+    return (
+        silver_clean_users
+        .group_by("user_id")
+        .agg([
+            pl.col("events").count().alias("total_events"),
+            pl.col("last_login").max().alias("latest_activity")
+        ])
+    )
+```
 
-### Installation
+This layered approach ensures data quality improves at each stage and makes debugging much easier - you know exactly which layer might have issues.
 
-Install Polster using pip:
+## Installation
 
+### Requirements
+- Python 3.12 or higher
+- pip package manager
+
+### Install from PyPI (Recommended)
 ```bash
 pip install polster
 ```
 
-Alternatively, for the latest development version:
-
+### Install from Source (Development)
 ```bash
 git clone https://github.com/sultanaltair96/polster-cli-grok
 cd polster-cli-grok
-pip install -e "[dev]"
+pip install -e ".[dev]"
 ```
 
-### Create a New Project
+### Verify Installation
+```bash
+polster --version
+```
 
-Set up a new Polster project with one command:
+You should see the version number if installed correctly.
 
+## Quick Start
+
+Let's create your first Polster project in 5 minutes:
+
+1. **Create Project**
+   ```bash
+   polster init my_first_pipeline
+   cd my_first_pipeline
+   ```
+
+2. **Add a Bronze Asset** (raw data)
+   ```bash
+   polster add-asset --layer bronze --name ingest_sales
+   ```
+
+3. **Add a Silver Asset** (clean data)
+   ```bash
+   polster add-asset --layer silver --name clean_sales --dependencies ingest_sales
+   ```
+
+4. **Add a Gold Asset** (business metrics)  
+   ```bash
+   polster add-asset --layer gold --name sales_metrics --dependencies clean_sales
+   ```
+
+5. **Run Your Pipeline**
+   ```bash
+   python run_polster.py --ui
+   ```
+
+That's it! You now have a complete data pipeline following best practices.
+
+## Examples
+
+### Complete E-commerce Pipeline
+
+Let's build a realistic e-commerce analytics pipeline:
+
+```bash
+# Create project
+polster init ecommerce_analytics
+
+cd ecommerce_analytics
+
+# Bronze: Ingest raw order data
+polster add-asset --layer bronze --name raw_orders
+
+# Silver: Clean and validate orders  
+polster add-asset --layer silver --name validated_orders --dependencies raw_orders
+
+# Bronze: Ingest customer data
+polster add-asset --layer bronze --name raw_customers
+
+# Silver: Clean customer data
+polster add-asset --layer silver --name clean_customers --dependencies raw_customers
+
+# Gold: Customer lifetime value
+polster add-asset --layer gold --name customer_ltv --dependencies validated_orders,clean_customers
+
+# Gold: Product performance
+polster add-asset --layer gold --name product_analytics --dependencies validated_orders
+```
+
+### Interactive Dependency Selection
+
+When adding assets, Polster guides you:
+
+```bash
+$ polster add-asset --layer silver --name user_profiles
+
+Available Bronze assets to depend on:
+1. raw_user_events
+2. raw_user_logs  
+3. raw_signups
+
+Select dependencies (comma-separated numbers): 1,3
+```
+
+This ensures you can't accidentally create invalid dependencies (like Gold depending on Bronze).
+
+### Running & Monitoring
+
+```bash
+# Start Dagster UI
+python run_polster.py --ui
+
+# Or run specific assets
+python run_polster.py --asset bronze_raw_orders
+
+# Check pipeline status
+python run_polster.py --status
+```
+
+## API Reference
+
+### Global Options
+- `--help`: Show help message
+- `--version`: Show version information
+- `--verbose`: Enable verbose output
+
+### `polster init <project_name>`
+Create a new Polster project with standard directory structure.
+
+**Options:**
+- `--template <template>`: Use specific template (default: standard)
+
+**Example:**
 ```bash
 polster init my_project
 ```
 
-This will scaffold a project that adheres to Medallion Architecture.
+### `polster add-asset`
+Add a new asset to your project.
 
-### Add Assets to Your Project
+**Required Options:**
+- `--layer <bronze|silver|gold>`: Which layer to add asset to
+- `--name <asset_name>`: Asset name (snake_case recommended)
 
-Define new assets for different layers using the `polster add-asset` command:
+**Optional Options:**
+- `--dependencies <asset1,asset2>`: Comma-separated list of dependencies
+- `--description "Description"`: Asset description
+- `--template <template>`: Asset template to use
 
+**Examples:**
 ```bash
-# Add a Bronze asset for raw data ingestion
-polster add-asset --layer bronze --name ingest_logs
+# Add Bronze asset
+polster add-asset --layer bronze --name raw_logs
 
-# Add a Silver asset, dependent on Bronze
-polster add-asset --layer silver --name clean_logs --dependencies ingest_logs
+# Add Silver asset with dependencies
+polster add-asset --layer silver --name clean_logs --dependencies raw_logs
 
-# Add a Gold asset, dependent on Silver
-polster add-asset --layer gold --name reports --dependencies clean_logs
+# Add Gold asset
+polster add-asset --layer gold --name log_metrics --dependencies clean_logs
 ```
 
-Polster ensures compliance with Medallion rules, prompting you to align dependencies correctly.
+### `polster list-assets`
+List all assets in the current project.
 
-### Run Data Pipelines
+**Options:**
+- `--layer <layer>`: Filter by layer
+- `--format <table|json>`: Output format
 
-Explore how Medallion Architecture works by running sample transformations:
+### `polster validate`
+Validate project structure and dependencies.
 
-```bash
-cd my_project
+**Checks:**
+- Asset naming conventions
+- Dependency rules compliance
+- Import path correctness
+- Required files presence
 
-# Bronze: Ingest raw data
-python src/core/bronze_example.py
+## Troubleshooting
 
-# Silver: Clean and validate data
-python src/core/silver_example.py
+### Common Issues
 
-# Gold: Aggregate and summarize data
-python src/core/gold_example.py
-```
+**"Module not found" errors:**
+- Ensure you're in the project directory
+- Run `pip install -e .` to install the project in development mode
 
-### Launch the Polster Dashboard
+**Assets not appearing in Dagster UI:**
+- Check `workspace.yaml` has correct pythonpath
+- Restart the Dagster daemon: `dagster-daemon restart`
 
-Monitor and orchestrate your data pipelines with the built-in dashboard:
+**Dependency conflicts:**
+- Silver assets can only depend on Bronze
+- Gold assets can only depend on Silver
+- Use `polster validate` to check compliance
 
-```bash
-python run_polster.py --ui
-```
-
-The dashboard provides visibility into the state of your pipelines, offering insights into execution and dependencies.
-
----
-
-## What Polster Is Not
-
-While powerful, Polster is focused and opinionated. It is not:
-- **A low-code or no-code tool**: Polster is Python-first and tailored for engineers.
-- **A generic orchestrator**: It enforces Medallion Architecture principles rigorously.
-- **A general-purpose analytics platform**: It focuses on building pipelines, not visualizations.
-- **Notebook-first**: Designed for production-quality data workflows, not experimentation.
-
----
+**Performance issues:**
+- Use Polars for large datasets instead of pandas
+- Consider partitioning large Bronze assets
+- Add caching to expensive transformations
 
 ## Contributing
 
-We welcome community contributions to improve Polster further. Whether it’s reporting a bug, suggesting features, or contributing code, visit our [GitHub repository](https://github.com/sultanaltair96/polster-cli-grok) to get involved.
+We welcome contributions! Polster is built by the community for the community.
+
+### Development Setup
+```bash
+git clone https://github.com/sultanaltair96/polster-cli-grok
+cd polster-cli-grok
+pip install -e ".[dev]"
+```
+
+### Running Tests
+```bash
+pytest
+```
+
+### Code Style
+- Use Black for formatting
+- Follow PEP 8 conventions
+- Add type hints where possible
+- Write comprehensive docstrings
+
+### Submitting Changes
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes
+4. Add tests if applicable
+5. Submit a pull request
 
 ## License
 
-Polster is available under the MIT License. See the [LICENSE](LICENSE) file for more information.
+Polster is available under the MIT License. See [LICENSE](LICENSE) for details.
+
+---
+
+**Ready to build better data pipelines?** Get started with `polster init your_project` today!</content>
+<parameter name="filePath">README.md

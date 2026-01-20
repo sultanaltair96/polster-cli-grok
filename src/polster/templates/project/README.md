@@ -1,367 +1,285 @@
-# 🚀 YOUR PYTHON BASED FULLY OPEN SOURCE DATA FACTORY
+# Welcome to Your Polster Data Project
 
-## 💥 THE DATA ENGINEERING NIGHTMARE (AND WHY IT MUST DIE)
+You've successfully created a **{{PROJECT_NAME}}** project using Polster CLI! This README will help you get started quickly and build your data pipeline.
 
-Let's be brutally honest: Data engineering today is a complete disaster. Teams burn 6+ months building pipelines that fail spectacularly. Dependencies become spaghetti code nightmares. Data quality? Forget about it. It's like trying to build the Starship with Excel spreadsheets and prayers.
+## 🚀 Quick Start (5 Minutes to First Pipeline)
 
-The problem isn't the tools. The problem is fundamental. We need to rethink data engineering from first principles.
-
-Polster is a Python-based, open-source data factory that enforces medallion architecture at the framework level.
-
-Key principles of enforcement:
-- Bronze assets cannot depend on anything.
-- Silver assets can only depend on bronze.
-- Gold assets can only depend on silver.
-- Quality checks are first-class, not optional.
-
-This changes everything. Welcome to the data engineering revolution.
-
-## ⚡ FROM ZERO TO DATA EMPIRE IN 5 MINUTES
-
-The old world: Endless meetings about dependencies. Manual quality checks. Pipelines that break on day one.
-
-The new world: Type a few commands. Get a factory that runs itself.
-
+### 1. Explore Your Project Structure
 ```bash
-# 1. Get the revolution (30 seconds)
-git clone https://github.com/sultanaltair96/polster-cli-grok
-cd polster-cli-grok
-pip install -e ".[dev]"
-cd ..
-
-# 2. Build your empire (2 minutes)
-polster init {{PROJECT_NAME}}
-
-# 3. Test the machinery (3 minutes)
 cd {{PROJECT_NAME}}
-python src/core/bronze_example.py   # Raw data flows in
-python src/core/silver_example.py   # Quality transformation
-python src/core/gold_example.py     # Business intelligence emerges
-
-# 4. Launch automated domination!
-python run_polster.py --ui  # 🚀 Your empire runs forever
+ls -la
 ```
 
-BOOM. Open http://127.0.0.1:3000. Watch your medallion pipeline materialize automatically. Dependencies converge perfectly. Monitoring dashboard included. This used to take armies of engineers. Now it's 5 minutes.
+Your project includes:
+- `src/core/` - Data transformation logic
+- `src/orchestration/` - Dagster pipeline orchestration  
+- `run_polster.py` - Main runner script
 
-## 🏗️ MEDALLION ARCHITECTURE: THE ONLY WAY THAT MAKES SENSE
-
-Medallion architecture isn't theory. It's fundamental. Think of data like physical materials:
-
-**BRONZE LAYER: RAW ORE** ⛰️
-- Unprocessed, unfiltered, unapologetic data
-- Direct from sources: APIs, databases, streams, files
-- No dependencies (obviously)
-- Fan-out: Multiple sources feed the beast
-
-**SILVER LAYER: REFINED METAL** ⚙️
-- Cleaned, transformed, validated, standardized
-- Depends ONLY on bronze (enforced by physics)
-- Business logic, quality gates, data contracts
-- Convergence: Multiple bronzes become focused datasets
-
-**GOLD LAYER: WEAPONS-GRADE ALLOY** 🏆
-- Business-ready, decision-making, revenue-generating
-- Depends ONLY on silver (no shortcuts to raw ore!)
-- Analytics, ML features, executive dashboards
-- Convergence: Silver becomes competitive advantage
-
-**WHY THIS WORKS:** Dependencies MUST converge. You can't build rockets from raw ore. You need refining. Polster enforces this automatically because anything else is engineering suicide.
-
-## 📦 YOUR PRODUCTION EMPIRE BLUEPRINT
-
-```
-{{PROJECT_NAME}}/
-├── src/
-│   ├── core/                    # Your transformation empire
-│   │   ├── bronze_*.py         # Raw data conquest
-│   │   ├── silver_*.py         # Quality domination
-│   │   ├── gold_*.py           # Business supremacy
-│   │   ├── storage.py          # Auto-scaling data vaults
-│   │   ├── settings.py         # Empire configuration
-│   │   └── paths.py            # Dynamic territory mapping
-│   └── orchestration/          # Automation command center
-│       ├── definitions.py      # Auto-discovering asset empire
-│       ├── assets/             # Layered asset legions
-│       │   ├── bronze/         # Bronze asset warriors
-│       │   ├── silver/         # Silver asset commanders
-│       │   └── gold/           # Gold asset emperors
-│       └── utils.py            # Imperial utilities
-├── run_polster.py              # Your command throne
-├── workspace.yaml              # Battle strategy config
-├── pyproject.toml              # Imperial dependencies
-└── README.md                   # Your conquest manual
-```
-
-## 🚀 ASSET CONQUEST: INTELLIGENT DEPENDENCY DOMINATION
-
-Forget manual dependency tracking. Polster's AI handles the empire-building:
-
+### 2. Test the Sample Pipeline
 ```bash
-# Bronze conquest (pure, no dependencies)
-polster add-asset --layer bronze --name enemy_intel
+# Generate sample bronze data
+python src/core/bronze_example.py
 
-# Silver campaign (strategic dependency selection)
-polster add-asset --layer silver --name battle_plans
-# Polster: "Select bronze assets for conquest..."
-# You: enemy_intel, supply_lines, troop_movements
+# Transform to silver (clean) data
+python src/core/silver_example.py
 
-# Gold supremacy (enforced silver-only dependencies)
-polster add-asset --layer gold --name victory_metrics
-# Polster: Only silver assets allowed - no raw data shortcuts!
+# Create gold (business) insights
+python src/core/gold_example.py
 ```
 
-**Automatic Empire Building:**
-- `src/core/<layer>_<name>.py` - Your transformation logic
-- `src/orchestration/assets/<layer>/run_<layer>_<name>.py` - Dagster asset definition
-- Dependencies wired automatically in pipeline definitions
-
-**Dependency Intelligence (Enforced by AI):**
-- Bronze: No upstreams (sovereign territories)
-- Silver: Multiple bronze conquests allowed
-- Gold: Multiple silver victories allowed, bronze forbidden
-- Convergence prevents empire collapse
-
-## 🔧 CONFIGURATION & SCALING TO INTERSTELLAR LEVELS
-
-### Storage Empires (Scale to Infinity)
-Edit `.env`:
+### 3. Launch the Pipeline Dashboard
 ```bash
-# Local development outposts
-STORAGE_BACKEND=local
-
-# Galactic cloud storage
-STORAGE_BACKEND=adls
-ADLS_ACCOUNT_NAME=your_imperial_account
-ADLS_CONTAINER=your_vault
-ADLS_BASE_PATH=polster/conquests
+python run_polster.py --ui
 ```
 
-### Environment Conquest
-- **Development:** Local testing grounds
-- **Staging:** Cloud battle simulations
-- **Production:** Multi-galaxy cloud empires with automated scheduling
+Open http://127.0.0.1:3000 to see your pipeline running with automatic scheduling and monitoring!
 
-Polster scales from laptop to interplanetary data centers.
+## 🏗️ Understanding Medallion Architecture
 
-## 🛠️ EMPIRE OPERATIONS & COMMAND CODES
+Polster enforces a **Medallion Architecture** to ensure data quality and maintainability:
 
+### Bronze Layer: Raw Data
+- **Purpose**: Ingest raw data as-is
+- **Dependencies**: None
+- **Example**: API responses, CSV files, database dumps
+
+### Silver Layer: Clean Data
+- **Purpose**: Validate, clean, and transform data
+- **Dependencies**: Bronze assets only
+- **Example**: Deduplicated records, type validation, business logic
+
+### Gold Layer: Business Insights
+- **Purpose**: Aggregate for business decisions
+- **Dependencies**: Silver assets only
+- **Example**: KPIs, ML features, executive reports
+
+**Why this matters**: Prevents shortcuts that lead to data quality issues and makes debugging easier.
+
+## ⚡ Building Your Pipeline with CLI
+
+### Add Your First Bronze Asset
 ```bash
-# Core imperial operations
-python run_polster.py --ui           # Launch throne room + auto-conquests
-python run_polster.py                # Execute all campaigns
-python run_polster.py --no-materialize --ui  # Throne room only
-
-# Imperial development workflow
-source .venv/bin/activate
-pip install -e ".[dev]"
-pytest                              # Test imperial defenses
-ruff format . && ruff check .      # Maintain code supremacy
+polster add-asset --layer bronze --name user_events
 ```
 
-### Automated Imperial Scheduling
-- Bronze campaigns: Daily midnight conquests (data ingestion)
-- Silver/Gold: Triggered by upstream victories (converging dominance)
+This creates:
+- `src/core/bronze_user_events.py` - Your transformation code
+- `src/orchestration/assets/bronze/bronze_user_events.py` - Dagster asset
 
-## 🎯 ADVANCED: EXPAND YOUR GALACTIC EMPIRE
+Edit `src/core/bronze_user_events.py` to load your data:
 
-### Custom Storage Conquests
-Extend `storage.py` for new territories:
 ```python
-def conquer_s3(df, layer, filename):
-    # Your S3 domination strategy
-    pass
+@asset
+def bronze_user_events():
+    """Load raw user events data"""
+    return pl.read_csv("data/user_events.csv")
 ```
 
-### Specialized Asset Legions
-Create ML, streaming, real-time asset warriors.
-
-### Multi-Realm Deployments
-Dev/Staging/Prod with realm-specific configurations.
-
-### Imperial Monitoring & Alerts
-Built-in pipeline surveillance with victory/failure notifications.
-
-## 🏆 WHY POLSTER CONQUERS ALL
-
-**SPEED:** 5 minutes vs 6+ months of traditional engineering hell
-**QUALITY:** Mandatory medallion prevents data disasters
-**SIMPLICITY:** AI handles dependencies, you focus on conquest
-**SCALABILITY:** From prototype to galactic empire without rebuilding
-**OPEN SOURCE:** Community-driven, transparent, infinitely extensible
-
-Data engineering shouldn't be a death march. With Polster, it's your path to domination.
-
-**Ready to conquer the data universe?** `polster init your_empire` and let's build something that changes everything.
-
-🚀 MAKE DATA GREAT AGAIN 🚀
-
-## Step 2: Explore your new factory
+### Add a Silver Asset
 ```bash
-cd sales_analytics
+polster add-asset --layer silver --name clean_users --dependencies bronze_user_events
 ```
 
-## Step 3: Test the sample production line
+Polster will show available Bronze assets to select from. Edit the generated file to clean your data:
+
+```python
+@asset
+def silver_clean_users(bronze_user_events):
+    """Clean and validate user data"""
+    return (
+        bronze_user_events
+        .drop_nulls()
+        .filter(pl.col("age") > 0)
+    )
+```
+
+### Add a Gold Asset
 ```bash
-python src/core/bronze_example.py   # 📦 Generate sample sales data
-python src/core/silver_example.py   # ⚙️ Clean and transform the data
-python src/core/gold_example.py     # 📊 Create business-ready reports
+polster add-asset --layer gold --name user_metrics --dependencies silver_clean_users
 ```
 
-## Step 4: Launch automated production!
+Create business insights:
+
+```python
+@asset
+def gold_user_metrics(silver_clean_users):
+    """Calculate user engagement metrics"""
+    return (
+        silver_clean_users
+        .group_by("user_id")
+        .agg([
+            pl.col("events").count().alias("total_events"),
+            pl.col("last_login").max().alias("last_active")
+        ])
+    )
+```
+
+## 📊 Running & Monitoring Your Pipeline
+
+### Development Mode
 ```bash
-python run_polster.py --ui  # 🚀 Factory runs with automated production and monitoring dashboard
+# Run everything and open dashboard
+python run_polster.py --ui
+
+# Run only the pipeline (no UI)
+python run_polster.py
+
+# Open dashboard without running
+python run_polster.py --no-materialize --ui
 ```
 
-**Watch your data flow:** Open http://127.0.0.1:3000 to see your medallion pipeline in action - assets materialize automatically, dependencies converge beautifully, and you get a production-ready monitoring dashboard!
-
-**Ready to customize?** Add your own assets with `polster add-asset` and let Polster handle the architectural heavy lifting.
-
-## Project Structure
-
-```
-{{PROJECT_NAME}}/
-├── src/
-│   ├── core/                    # Data processing logic
-│   │   ├── bronze_example.py     # Bronze layer example
-│   │   ├── silver_example.py     # Silver layer example
-│   │   ├── gold_example.py       # Gold layer example
-│   │   ├── storage.py            # Storage abstraction (local/ADLS)
-│   │   ├── settings.py           # Configuration
-│   │   └── paths.py              # Path utilities
-│   └── orchestration/            # Dagster orchestration
-│       ├── definitions.py        # Asset definitions and scheduling
-│       ├── utils.py              # Helper functions
-│       └── assets/               # Dagster assets
-│           ├── bronze/
-│           ├── silver/
-│           └── gold/
- ├── .env.example                  # Environment variables template
- ├── run_polster.py               # Polster runner script
- └── README.md
-```
-
-## Adding New Assets
-
-### Adding a New Asset with the Polster CLI
-
-Use the `polster add-asset` command to add assets while maintaining Polster's structured Medallion architecture. For example:
-
+### Production Deployment
 ```bash
-# Add a new Bronze-layer asset
-polster add-asset --layer bronze --name raw_data_ingestion
-
-# Add a new Silver-layer asset
-polster add-asset --layer silver --name cleaned_data --dependencies bronze_asset_1,bronze_asset_2
-
-# Add a new Gold-layer asset
-polster add-asset --layer gold --name analytics_dashboard --dependencies silver_asset_1,silver_asset_2
+# Schedule with cron or your orchestrator
+0 6 * * * cd /path/to/project && python run_polster.py
 ```
 
-Polster will guide you interactively to ensure asset dependencies follow the Medallion principles. This process automatically generates two files:
-- `src/core/<layer>_<name>.py`: The transformation logic.
-- `src/orchestration/assets/<layer>/<layer>_<name>.py`: The corresponding Dagster asset definition.
+The dashboard shows:
+- Asset dependencies and status
+- Execution logs and errors
+- Data previews and metadata
+- Scheduling and sensors
 
-### Dependency Management
+## 💡 Common Patterns & Examples
 
-Polster strictly enforces Medallion architecture principles:
-- Bronze assets serve as the data ingestion layer and cannot depend on anything else.
-- Silver assets consolidate and clean data from one or more Bronze assets.
-- Gold assets aggregate and refine insights, relying only on Silver-layer outputs.
+### Ingesting Different Data Sources
 
-This ensures a clear, predictable data lineage while maintaining data quality at each stage.
-
-## Architecture & Dependencies
-
-Polster implements the **medallion architecture** for data transformation, ensuring **converging dependencies** that create clean, maintainable data pipelines:
-
-### Data Flow & Convergence Structure
-```
-Bronze Layer: [raw_data_1, raw_data_2, raw_data_3]  ← Multiple sources, no dependencies
-     ↓ (fan-out: raw ingestion)
-Silver Layer: [cleaned_data_1, cleaned_data_2]      ← Can depend on multiple bronze assets
-     ↓ (converge: data quality & transformation)
-Gold Layer: [business_summary]                       ← Can depend on multiple silver assets
+**CSV Files:**
+```python
+@asset
+def bronze_sales_data():
+    return pl.read_csv("data/sales.csv")
 ```
 
-### Layer Responsibilities
+**APIs:**
+```python
+@asset
+def bronze_api_data():
+    response = requests.get("https://api.example.com/data")
+    return pl.json_normalize(response.json())
+```
 
-#### Bronze Layer
-- **Purpose:** Raw, unprocessed data ingestion
-- **Dependencies:** None (direct from sources)
-- **Value:** Preserves original data fidelity
+**Databases:**
+```python
+@asset
+def bronze_db_data():
+    return pl.read_database("SELECT * FROM users", connection_string)
+```
 
-#### Silver Layer
-- **Purpose:** Cleaned and transformed data
-- **Dependencies:** Multiple bronze assets allowed
-- **Value:** Data quality gates, business logic, standardization
-- **Convergence:** Combines multiple raw sources into focused datasets
+### Data Quality & Validation
 
-#### Gold Layer
-- **Purpose:** Business-ready aggregated data
-- **Dependencies:** Multiple silver assets allowed (not bronze)
-- **Value:** Analytics, reporting, decision-making datasets
-- **Convergence:** Business-level aggregations from processed data
+**Silver Layer Validation:**
+```python
+@asset
+def silver_validated_sales(bronze_sales_data):
+    df = bronze_sales_data
 
-### Dependency Enforcement & Benefits
+    # Check required columns exist
+    required_cols = ["order_id", "amount", "date"]
+    missing = [col for col in required_cols if col not in df.columns]
+    if missing:
+        raise ValueError(f"Missing required columns: {missing}")
 
-**Architectural Guarantees:**
-- Prevents gold assets from bypassing silver transformations
-- Ensures data quality through mandatory cleaning steps
-- Maintains clear lineage and governance
-- Guides users toward best practices automatically
+    # Validate data types
+    df = df.with_columns([
+        pl.col("amount").cast(pl.Float64),
+        pl.col("date").str.strptime(pl.Date, "%Y-%m-%d")
+    ])
 
-**Convergence Advantages:**
-- **Data Consolidation:** Natural aggregation points prevent data sprawl
-- **Quality Assurance:** Each layer adds validation and transformation
-- **Performance:** Reduces redundant processing in downstream layers
-- **Maintainability:** Clear separation of concerns and dependencies
+    # Business rules
+    df = df.filter(pl.col("amount") > 0)
 
-When adding silver/gold assets, you'll be prompted to select upstream dependencies from the immediate upstream layer only, ensuring proper convergence flow.
+    return df
+```
 
-## Storage Configuration
+### Business Aggregations
 
-Edit `.env` to configure storage:
+**Gold Layer KPIs:**
+```python
+@asset
+def gold_sales_kpis(silver_validated_sales):
+    return (
+        silver_validated_sales
+        .group_by(pl.col("date").dt.month())
+        .agg([
+            pl.col("amount").sum().alias("monthly_revenue"),
+            pl.col("order_id").n_unique().alias("monthly_orders"),
+            (pl.col("amount").sum() / pl.col("order_id").n_unique()).alias("avg_order_value")
+        ])
+        .sort("date")
+    )
+```
 
+## 🔧 Configuration & Storage
+
+### Local Development
+Default settings work out-of-the-box for local development.
+
+### Cloud Storage (ADLS)
+Create `.env` file:
 ```bash
-# Local storage (default)
-STORAGE_BACKEND=local
-
-# ADLS storage
 STORAGE_BACKEND=adls
 ADLS_ACCOUNT_NAME=your_storage_account
 ADLS_CONTAINER=your_container
-ADLS_BASE_PATH=polster/data
-ADLS_ACCOUNT_KEY=your_account_key
+ADLS_BASE_PATH=data/{{PROJECT_NAME}}
+ADLS_ACCOUNT_KEY=your_key_here
 ```
 
-## Development
+### Environment Variables
+- `STORAGE_BACKEND`: `local` or `adls`
+- `ADLS_*`: Azure Data Lake Storage settings
 
-```bash
-# Install dependencies
-source .venv/bin/activate
-pip install -e ".[dev]"
+## 🐛 Troubleshooting
 
-# Run tests
-pytest
+### Pipeline Won't Start
+- Check `workspace.yaml` has correct `pythonpath`
+- Run `pip install -e .` in project directory
 
-# Format code
-ruff format .
-ruff check .
+### Assets Not Found
+- Verify file names match asset definitions
+- Check import statements in `definitions.py`
+
+### Dependency Errors
+- Silver can only depend on Bronze
+- Gold can only depend on Silver
+- Use `polster validate` to check
+
+### Performance Issues
+- Use Polars instead of pandas for large datasets
+- Add `.persist()` for intermediate results
+- Consider partitioning large files
+
+## 📁 Project Structure
+
+```
+{{PROJECT_NAME}}/
+├── src/
+│   ├── core/                    # Your transformation logic
+│   │   ├── bronze_*.py         # Raw data ingestion
+│   │   ├── silver_*.py         # Data cleaning/validation
+│   │   ├── gold_*.py           # Business aggregations
+│   │   ├── storage.py          # Storage abstraction
+│   │   ├── settings.py         # Configuration
+│   │   └── paths.py            # Path utilities
+│   └── orchestration/          # Dagster setup
+│       ├── definitions.py      # Asset definitions
+│       ├── assets/             # Auto-generated assets
+│       └── utils.py            # Helper functions
+├── run_polster.py              # Main runner
+├── workspace.yaml              # Dagster config
+├── pyproject.toml              # Dependencies
+└── README.md                   # This file
 ```
 
-## Dagster Commands
+## 🎯 Next Steps
 
-```bash
-# Start UI (recommended - includes automatic materialization)
-python run_polster.py --ui
+1. **Customize your assets** - Edit the generated files in `src/core/`
+2. **Add more assets** - Use `polster add-asset` to expand your pipeline
+3. **Set up scheduling** - Configure cron jobs or your orchestrator
+4. **Add tests** - Test your transformations with `pytest`
+5. **Deploy to production** - Set up cloud storage and monitoring
 
-# Materialize all assets only
-python run_polster.py
+**Need help?** Check the main Polster CLI documentation or open an issue on GitHub.
 
-# Start UI without materialization
-python run_polster.py --no-materialize --ui
-
-# Alternative: Materialize specific assets manually
-# (Use run_polster.py for most operations)
-```
+Happy building! 🚀</content>
+<parameter name="filePath">src/polster/templates/project/README.md
