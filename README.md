@@ -13,23 +13,28 @@ Whether you're new to data engineering or a seasoned architect, Polster provides
 
 ## Background
 
-Polster was born from experimenting with modern Python data tools like Polars and Dagster. These libraries represent the cutting edge of data engineering, and Polster combines their strengths into a batteries-included platform.
+Polster was inspired by the same philosophy that made dbt revolutionary: **making data engineering accessible and enjoyable**. While dbt pioneered treating data transformations as code with SQL, Polster brings this approach to Python's ecosystem.
 
-**Polars** excels with its lightning-fast, memory-efficient DataFrame operations. Built in Rust, it delivers:
-- **Speed**: Multi-threaded processing that's 5-10x faster than Pandas
-- **Scalability**: Handles millions of rows effortlessly with lazy evaluation
-- **Expressiveness**: Familiar API that feels like Pandas but optimized for performance
+**What dbt Got Right:**
+- **Easy Getting Started**: Simple `dbt init` creates a full project instantly
+- **Transformation as Code**: Version-controlled, testable data models
+- **Built-in Best Practices**: Guides users toward reliable patterns
+- **Documentation Culture**: Auto-generated lineage and model documentation
 
-**Dagster** revolutionizes pipeline orchestration with data-aware workflows:
-- **Asset Modeling**: Treats data as first-class citizens with automatic lineage tracking
-- **Visibility**: Built-in dashboards and monitoring for production pipelines
-- **Flexibility**: Extensible framework that integrates with modern tools and platforms
+**Polster adapts these principles for Python:**
+- **Polars** delivers unmatched speed and efficiency in data processing
+- **Dagster** provides intelligent pipeline orchestration with asset modeling
+- **Python-First**: Full Python ecosystem instead of SQL constraints
 
-**Polster picks up these strengths** and adds:
-- **Enforced Architecture**: Automatic Medallion layers prevent common mistakes
-- **CLI Simplicity**: One-command project generation and asset management
-- **Production Templates**: Ready-to-deploy code with storage, monitoring, and error handling
-- **Batteries Included**: Everything you need to go from idea to production pipeline
+**The Result**: dbt's ease of use meets Python's power - a batteries-included platform that feels familiar to dbt users but unlocks Python's full potential.
+
+| dbt Concept | Polster Equivalent | Python Advantage |
+|-------------|-------------------|------------------|
+| `dbt init` | `polster init` | Full Python project with virtual environment |
+| SQL Models | Python Assets | Any Python library, complex logic, ML models |
+| dbt Tests | Medallion Layers | Built-in data quality with flexible validation |
+| dbt Docs | Dagster UI | Interactive pipeline monitoring and debugging |
+| Materializations | Storage Backends | Native Python integrations (APIs, databases, etc.) |
 
 ## Table of Contents
 

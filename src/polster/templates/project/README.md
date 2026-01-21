@@ -2,6 +2,8 @@
 
 You've successfully created a **{{PROJECT_NAME}}** project using Polster CLI! This README will help you get started quickly and build your data pipeline.
 
+**If you love dbt's workflow, you'll feel right at home with Polster** - same reliability principles, but with Python's full power. Like `dbt init` creates a dbt project, `polster init` gives you a production-ready Python data pipeline with enforced best practices.
+
 ## 🚀 Quick Start (5 Minutes to First Pipeline)
 
 ### 1. Explore Your Project Structure
