@@ -885,7 +885,7 @@ def remove_asset(
         try:
             file_path.unlink()
             removed_count += 1
-            rprint(f"✅ Removed {file_path.relative_to(project_path)}")
+            rprint(f"[REMOVED] {file_path.relative_to(project_path)}")
         except Exception as e:
             rprint(
                 f"[red]Failed to remove {file_path.relative_to(project_path)}: {e}[/red]"
