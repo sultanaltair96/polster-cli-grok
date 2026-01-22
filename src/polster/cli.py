@@ -44,10 +44,10 @@ def copy_template_file(
         shutil.copy2(src, dest)
         return
 
-    content = src.read_text()
+    content = src.read_text(encoding='utf-8')
     for key, value in replacements.items():
         content = content.replace(key, value)
-    dest.write_text(content)
+    dest.write_text(content, encoding='utf-8')
 
 
 def ensure_polster_project() -> Path:
