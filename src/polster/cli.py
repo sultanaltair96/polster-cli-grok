@@ -902,5 +902,63 @@ def remove_asset(
         rprint("[yellow]No files were removed[/yellow]")
 
 
+@app.command()
+def setup(
+    force: bool = typer.Option(False, "--force", help="Force recreation of virtual environment"),
+) -> None:
+    """Set up or recreate the virtual environment for this project."""
+    try:
+        project_root = Path.cwd()
+
+        # Find project root if not already there
+        if not (project_root / "pyproject.toml").exists():
+            # Try to find it by going up directories
+            for parent in [project_root] + list(project_root.parents):
+                if (parent / "pyproject.toml").exists() and (parent / "src" / "polster").exists():
+                    project_root = parent
+                    break
+            else:
+                rprint("[red]Error: Could not find polster project root[/red]")
+                rprint("Make sure you're in a polster project directory or subdirectory.")
+                raise typer.Exit(1)
+
+        venv_path = project_root / ".venv"
+
+        # Check if venv already exists
+        if venv_path.exists() and not force:
+            rprint(f"[yellow]Virtual environment already exists at {venv_path}[/yellow]")
+            rprint("Use --force to recreate it.")
+            return
+
+        # Remove existing venv if force is used
+        if venv_path.exists() and force:
+            rprint("[yellow]Removing existing virtual environment...[/yellow]")
+            shutil.rmtree(venv_path)
+
+        # Create new venv
+        rprint(f"[OK] Creating virtual environment in {venv_path}")
+        subprocess.run([sys.executable, "-m", "venv", str(venv_path)], check=True)
+
+        # Install package in venv
+        if os.name == "nt":  # Windows
+            pip_path = venv_path / "Scripts" / "pip.exe"
+        else:  # Unix
+            pip_path = venv_path / "bin" / "pip"
+
+        rprint("[OK] Installing polster in virtual environment...")
+        subprocess.run([str(pip_path), "install", "-e", str(project_root)], check=True)
+
+        rprint("[green]Virtual environment setup complete![/green]")
+        rprint(f"[DIR] Location: {venv_path}")
+        rprint("\n[START] You can now use polster commands seamlessly!")
+
+    except subprocess.CalledProcessError as e:
+        rprint(f"[red]Error during setup: {e}[/red]")
+        raise typer.Exit(1) from None
+    except Exception as e:
+        rprint(f"[red]Unexpected error: {e}[/red]")
+        raise typer.Exit(1) from None
+
+
 if __name__ == "__main__":
     app()
