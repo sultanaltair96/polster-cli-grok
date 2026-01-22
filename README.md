@@ -160,6 +160,19 @@ pip install -e ".[dev]"
 
 **Note:** You may see a warning about the script not being on PATH. This is normal and can be ignored - Polster's automatic virtual environment system works regardless of your PATH configuration.
 
+**To use polster commands immediately after installation:**
+```bash
+# Use the full path to the script
+"C:\Users\%USERNAME%\AppData\Roaming\Python\Python314\Scripts\polster.exe" --help
+
+# Or add the Scripts directory to your PATH (optional)
+# Windows PowerShell:
+$env:PATH += ";C:\Users\$env:USERNAME\AppData\Roaming\Python\Python314\Scripts"
+
+# Windows Command Prompt:
+set PATH=%PATH%;C:\Users\%USERNAME%\AppData\Roaming\Python\Python314\Scripts
+```
+
 #### Windows Installation Notes
 If you're using PowerShell on Windows and encounter path issues with directories containing spaces:
 
