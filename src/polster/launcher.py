@@ -69,6 +69,12 @@ def activate_venv_and_run(venv_path: Path, args: list[str]) -> None:
         app(args=args)
 
 
+def is_development_environment(project_root: Path) -> bool:
+    """Check if we're running from the development repository."""
+    return (project_root / "src" / "polster" / "launcher.py").exists() and \
+           (project_root / "src" / "polster" / "cli.py").exists()
+
+
 def main() -> None:
     """Main entry point that handles venv auto-activation."""
     try:
@@ -82,6 +88,17 @@ def main() -> None:
 
         # For all other commands, find project and activate venv
         project_root = find_project_root()
+
+        # Check if we're in the development environment
+        if is_development_environment(project_root):
+            # In development, run CLI directly without venv
+            from polster.cli import app
+            if args and args[0].endswith("polster"):
+                args = args[1:]  # Remove 'polster' from args
+            app(args=args)
+            return
+
+        # For generated projects, use venv activation
         venv_path = project_root / ".venv"
 
         # Check if venv exists
