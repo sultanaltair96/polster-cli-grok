@@ -158,6 +158,31 @@ cd polster-cli
 pip install -e ".[dev]"
 ```
 
+#### Windows Installation Notes
+If you're using PowerShell on Windows and encounter path issues with directories containing spaces:
+
+**Always use quotes around paths:**
+```powershell
+# Instead of:
+cd C:\Users\tanis\Desktop\Personal Projects\polster testing
+git clone https://github.com/sultanaltair96/polster-cli
+cd polster-cli
+
+# Use quotes:
+cd "C:\Users\tanis\Desktop\Personal Projects\polster testing"
+git clone https://github.com/sultanaltair96/polster-cli
+cd "polster-cli"
+```
+
+**Alternative: Use Command Prompt**
+PowerShell sometimes has issues with spaces in paths. You can also use Command Prompt:
+```cmd
+cd C:\Users\tanis\Desktop\Personal Projects\polster testing
+git clone https://github.com/sultanaltair96/polster-cli
+cd polster-cli
+pip install -e ".[dev]"
+```
+
 ### Verify Installation
 ```bash
 polster --version
@@ -533,6 +558,9 @@ git clone https://github.com/sultanaltair96/polster-cli
 cd polster-cli
 pip install -e ".[dev]"
 ```
+
+**Windows Development Notes:**
+If you encounter PowerShell path issues with spaces in directory names, refer to the [Windows Installation Notes](#windows-installation-notes) above.
 
 ### Running Tests
 ```bash
