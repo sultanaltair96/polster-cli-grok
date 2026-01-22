@@ -158,6 +158,8 @@ cd polster-cli
 pip install -e ".[dev]"
 ```
 
+**Note:** You may see a warning about the script not being on PATH. This is normal and can be ignored - Polster's automatic virtual environment system works regardless of your PATH configuration.
+
 #### Windows Installation Notes
 If you're using PowerShell on Windows and encounter path issues with directories containing spaces:
 
