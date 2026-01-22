@@ -3,7 +3,7 @@
 [![PyPI version](https://badge.fury.io/py/polster.svg)](https://pypi.org/project/polster/)
 [![Python 3.12+](https://img.shields.io/badge/python-3.12+-blue.svg)](https://www.python.org/downloads/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![CI](https://github.com/sultanaltair96/polster-cli-grok/actions/workflows/ci.yml/badge.svg)](https://github.com/sultanaltair96/polster-cli-grok/actions)
+[![CI](https://github.com/sultanaltair96/polster-cli/actions/workflows/ci.yml/badge.svg)](https://github.com/sultanaltair96/polster-cli/actions)
 
 **Build reliable data pipelines with enforced Medallion Architecture**
 
@@ -153,8 +153,8 @@ pip install polster
 
 ### Install from Source (Development)
 ```bash
-git clone https://github.com/sultanaltair96/polster-cli-grok
-cd polster-cli-grok
+git clone https://github.com/sultanaltair96/polster-cli
+cd polster-cli
 pip install -e ".[dev]"
 ```
 
@@ -529,8 +529,8 @@ We welcome contributions! Polster is built by the community for the community.
 
 ### Development Setup
 ```bash
-git clone https://github.com/sultanaltair96/polster-cli-grok
-cd polster-cli-grok
+git clone https://github.com/sultanaltair96/polster-cli
+cd polster-cli
 pip install -e ".[dev]"
 ```
 
