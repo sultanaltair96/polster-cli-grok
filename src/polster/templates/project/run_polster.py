@@ -34,7 +34,7 @@ def build_env(root: pathlib.Path) -> dict[str, str]:
 
     pythonpath = str(root / "src")
     if "PYTHONPATH" in env:
-        env["PYTHONPATH"] = pythonpath + ":" + env["PYTHONPATH"]
+        env["PYTHONPATH"] = pythonpath + os.pathsep + env["PYTHONPATH"]
     else:
         env["PYTHONPATH"] = pythonpath
 
