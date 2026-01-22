@@ -45,6 +45,7 @@ Polster was inspired by the same philosophy that made dbt revolutionary: **makin
 - [Installation](#installation)
 - [Quick Start](#quick-start)
 - [Examples](#examples)
+- [Connectors](#connectors)
 - [API Reference](#api-reference)
 - [Contributing](#contributing)
 - [License](#license)
@@ -167,7 +168,7 @@ Let's create your first Polster project in 5 minutes:
 
 1. **Create Project**
    ```bash
-   polster init my_first_pipeline
+   polster init my_first_pipeline --cicd github-actions  # Optional: add CI/CD pipeline
    cd my_first_pipeline
    ```
 
@@ -192,6 +193,65 @@ Let's create your first Polster project in 5 minutes:
    ```
 
 That's it! You now have a complete data pipeline following best practices.
+
+## Connectors
+
+Polster provides modular connector templates for common data sources, following a "batteries included" philosophy through extensible guides rather than bundled dependencies.
+
+### Available Connectors
+
+- **MySQL**: Ingest data from MySQL databases with secure connection handling
+- **REST APIs**: Fetch data from REST APIs with support for Bearer tokens, API keys, and Basic auth
+- **SFTP**: Download files from SFTP servers (ingestion-only, maintaining data lake architecture)
+
+### Getting Started with Connectors
+
+1. **Copy the template**:
+   ```bash
+   cp docs/connectors/connectors.py.template src/core/connectors.py
+   ```
+
+2. **Install dependencies** as needed:
+   ```bash
+   pip install pymysql requests paramiko  # Install only what you need
+   ```
+
+3. **Follow the guides**:
+   - [MySQL Connector Guide](docs/connectors/mysql-guide.md)
+   - [API Connector Guide](docs/connectors/api-guide.md)
+   - [SFTP Connector Guide](docs/connectors/sftp-guide.md)
+   - [Integration Guide](docs/connectors/integration.md)
+
+### Why Templates Instead of Built-ins?
+
+- **Lightweight**: No forced dependencies on unused connectors
+- **Flexible**: Adapt templates to your specific requirements
+- **Secure**: You control authentication and connection methods
+- **Extensible**: Easy to add new connector types following the same patterns
+
+### Example: MySQL Connector
+
+```python
+# src/core/bronze_mysql_users.py
+import os
+from dagster import asset
+from core.connectors import connect_mysql, fetch_mysql_data
+
+@asset
+def bronze_mysql_users():
+    conn = connect_mysql(
+        host=os.getenv('MYSQL_HOST'),
+        user=os.getenv('MYSQL_USER'),
+        password=os.getenv('MYSQL_PASSWORD'),
+        database=os.getenv('MYSQL_DATABASE')
+    )
+
+    df = fetch_mysql_data(conn, "SELECT * FROM users")
+    conn.close()
+    return df
+```
+
+See the [Integration Guide](docs/connectors/integration.md) for complete examples and best practices.
 
 ## Examples
 
@@ -265,11 +325,18 @@ python run_polster.py --status
 Create a new Polster project with standard directory structure.
 
 **Options:**
-- `--template <template>`: Use specific template (default: standard)
+- `--cicd <platform>`: Generate CI/CD pipeline for specified platform (azure-devops, github-actions, gitlab-ci)
+- `--git/--no-git`: Initialize git repository (prompts if not specified)
+- `--sample-assets/--no-sample-assets`: Create sample stub assets
+- `--install-uv/--no-install-uv`: Install uv package manager
+- `--dry-run`: Show what would be created without creating
+- `--start-dagster`: Start Dagster UI after project creation
 
-**Example:**
+**Examples:**
 ```bash
 polster init my_project
+polster init my_project --cicd github-actions
+polster init my_project --cicd azure-devops --no-sample-assets
 ```
 
 ### `polster add-asset`

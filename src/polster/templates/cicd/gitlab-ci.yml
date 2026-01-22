@@ -1,0 +1,60 @@
+# Polster CI/CD Pipeline for GitLab CI
+# This pipeline automates data materialization and commits changes back to the repository
+
+stages:
+  - materialize
+
+materialize:
+  stage: materialize
+  image: python:3.12
+
+  # Trigger on push to master and schedules
+  # Note: Schedule this pipeline in GitLab UI with cron: "0 0 * * *"
+  only:
+    - master
+    - schedules
+
+  script:
+    # 0. Configure Git
+    - git config --global user.email "pipeline@gitlab-ci.local"
+    - git config --global user.name "GitLab CI Pipeline"
+
+    # 1. FORCE latest master (critical for scheduled runs)
+    - echo "Forcing workspace to latest origin/master"
+    - git fetch origin master
+    - git checkout master || git checkout -b master
+    - git reset --hard origin/master
+    - echo "Running commit:"
+    - git log -1 --oneline
+
+    # 2. Install uv
+    - python -m pip install --upgrade pip
+    - pip install uv
+
+    # 3. Create venv + install dependencies
+    - uv venv .venv
+    - source .venv/bin/activate
+    - pip install --upgrade pip
+    - uv sync
+
+    # 4. Run Polster materialization
+    - source .venv/bin/activate
+    - python run_polster.py
+
+    # 5. Commit and push changes (if any)
+    - git status
+    - git add data/ .dagster/
+
+    - |
+      if git diff --cached --quiet; then
+        echo "No changes to commit"
+      else
+        git commit -m "Automated commit from pipeline [skip ci]"
+        git push origin master
+      fi
+
+  # Cache dependencies
+  cache:
+    key: ${CI_COMMIT_REF_SLUG}
+    paths:
+      - .venv/

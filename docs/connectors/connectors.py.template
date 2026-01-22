@@ -1,0 +1,277 @@
+# Polster-CLI Connector Templates
+# This is a template file for creating data connectors.
+# Copy this file to your project's src/core/ directory and adapt as needed.
+# Do not modify this template directly.
+
+import os
+import fnmatch
+import polars as pl
+from typing import Optional, Dict, Any
+
+# =============================================================================
+# MySQL Connector Functions
+# Requires: pip install pymysql
+# =============================================================================
+
+def connect_mysql(host: str, user: str, password: str, database: str, port: int = 3306):
+    """
+    Establish connection to MySQL database.
+
+    Args:
+        host: Database host
+        user: Database user
+        password: Database password
+        database: Database name
+        port: Database port (default 3306)
+
+    Returns:
+        pymysql connection object
+    """
+    import pymysql
+
+    return pymysql.connect(
+        host=host,
+        user=user,
+        password=password,
+        database=database,
+        port=port,
+        cursorclass=pymysql.cursors.DictCursor
+    )
+
+def fetch_mysql_data(connection, query: str) -> pl.DataFrame:
+    """
+    Execute query and return results as Polars DataFrame.
+
+    Args:
+        connection: pymysql connection
+        query: SQL query string
+
+    Returns:
+        Polars DataFrame
+    """
+    return pl.read_database(query, connection)
+
+# Example usage in a Dagster asset:
+# @asset
+# def bronze_mysql_data():
+#     conn = connect_mysql(
+#         host=os.getenv('MYSQL_HOST'),
+#         user=os.getenv('MYSQL_USER'),
+#         password=os.getenv('MYSQL_PASSWORD'),
+#         database=os.getenv('MYSQL_DATABASE')
+#     )
+#     df = fetch_mysql_data(conn, "SELECT * FROM your_table")
+#     conn.close()
+#     return df
+
+# =============================================================================
+# API Connector Functions
+# Requires: pip install requests
+# =============================================================================
+
+def fetch_api_data(
+    url: str,
+    method: str = 'GET',
+    auth_method: Optional[str] = None,
+    auth_params: Optional[Dict[str, Any]] = None,
+    headers: Optional[Dict[str, str]] = None,
+    params: Optional[Dict[str, Any]] = None,
+    timeout: int = 30
+) -> pl.DataFrame:
+    """
+    Fetch data from REST API and return as Polars DataFrame.
+
+    Args:
+        url: API endpoint URL
+        method: HTTP method (GET, POST)
+        auth_method: 'basic', 'bearer', or 'api_key'
+        auth_params: Auth parameters (username/password for basic, token for bearer, key for api_key)
+        headers: Additional headers
+        params: Query parameters
+        timeout: Request timeout
+
+    Returns:
+        Polars DataFrame
+    """
+    import requests
+
+    # Prepare auth
+    auth = None
+    if auth_method == 'basic':
+        from requests.auth import HTTPBasicAuth
+        auth = HTTPBasicAuth(auth_params['username'], auth_params['password'])
+    elif auth_method == 'bearer':
+        headers = headers or {}
+        headers['Authorization'] = f"Bearer {auth_params['token']}"
+    elif auth_method == 'api_key':
+        headers = headers or {}
+        headers[auth_params.get('header', 'X-API-Key')] = auth_params['key']
+
+    # Make request
+    response = requests.request(
+        method=method,
+        url=url,
+        auth=auth,
+        headers=headers,
+        params=params,
+        timeout=timeout
+    )
+    response.raise_for_status()
+
+    # Parse JSON and convert to DataFrame
+    data = response.json()
+    # Assume data is a list of dicts; adjust as needed
+    if isinstance(data, list):
+        return pl.DataFrame(data)
+    elif isinstance(data, dict) and 'results' in data:
+        return pl.DataFrame(data['results'])
+    else:
+        # For single object, wrap in list
+        return pl.DataFrame([data])
+
+# Example usage:
+# @asset
+# def bronze_api_data():
+#     df = fetch_api_data(
+#         url="https://api.example.com/data",
+#         auth_method="bearer",
+#         auth_params={"token": os.getenv('API_TOKEN')}
+#     )
+#     return df
+
+# =============================================================================
+# SFTP Connector Functions (Ingestion Only)
+# Requires: pip install paramiko
+# =============================================================================
+
+def download_sftp_files(
+    host: str,
+    username: str,
+    password: Optional[str] = None,
+    key_path: Optional[str] = None,
+    remote_path: str,
+    local_path: str,
+    file_pattern: Optional[str] = None
+) -> list:
+    """
+    Download files from SFTP server to local path.
+
+    Args:
+        host: SFTP server host
+        username: SFTP username
+        password: SFTP password (if using password auth)
+        key_path: Path to SSH private key (if using key auth)
+        remote_path: Remote directory path
+        local_path: Local directory to save files
+        file_pattern: Glob pattern to match files (e.g., "*.csv")
+
+    Returns:
+        List of downloaded file paths
+    """
+    import paramiko
+    from pathlib import Path
+
+    # Connect
+    transport = paramiko.Transport((host, 22))
+    if key_path:
+        key = paramiko.RSAKey.from_private_key_file(key_path)
+        transport.connect(username=username, pkey=key)
+    else:
+        transport.connect(username=username, password=password)
+
+    sftp = paramiko.SFTPClient.from_transport(transport)
+
+    # Ensure local path exists
+    Path(local_path).mkdir(parents=True, exist_ok=True)
+
+    downloaded_files = []
+
+    # List and download files
+    for filename in sftp.listdir(remote_path):
+        if file_pattern and not fnmatch(filename, file_pattern):
+            continue
+
+        remote_file = f"{remote_path}/{filename}"
+        local_file = f"{local_path}/{filename}"
+
+        sftp.get(remote_file, local_file)
+        downloaded_files.append(local_file)
+
+    sftp.close()
+    transport.close()
+
+    return downloaded_files
+
+def load_sftp_data(local_files: list, format: str = 'csv') -> pl.DataFrame:
+    """
+    Load downloaded files into Polars DataFrame.
+
+    Args:
+        local_files: List of local file paths
+        format: File format ('csv', 'json', 'parquet')
+
+    Returns:
+        Combined Polars DataFrame
+    """
+    dfs = []
+    for file_path in local_files:
+        if format == 'csv':
+            df = pl.read_csv(file_path)
+        elif format == 'json':
+            df = pl.read_json(file_path)
+        elif format == 'parquet':
+            df = pl.read_parquet(file_path)
+        else:
+            raise ValueError(f"Unsupported format: {format}")
+        dfs.append(df)
+
+    # Combine all DataFrames
+    if dfs:
+        return pl.concat(dfs)
+    else:
+        return pl.DataFrame()
+
+# Example usage:
+# @asset
+# def bronze_sftp_data():
+#     files = download_sftp_files(
+#         host=os.getenv('SFTP_HOST'),
+#         username=os.getenv('SFTP_USER'),
+#         password=os.getenv('SFTP_PASSWORD'),
+#         remote_path="/data",
+#         local_path="./temp",
+#         file_pattern="*.csv"
+#     )
+#     df = load_sftp_data(files, format='csv')
+#     return df
+
+# =============================================================================
+# Helper Functions
+# =============================================================================
+
+def validate_connection(connection) -> bool:
+    """
+    Basic connection validation.
+    Adapt based on connection type.
+    """
+    try:
+        # For MySQL
+        if hasattr(connection, 'ping'):
+            connection.ping()
+        # For others, add checks
+        return True
+    except Exception:
+        return False
+
+def handle_errors(func):
+    """
+    Decorator for error handling.
+    Use as @handle_errors above your functions.
+    """
+    def wrapper(*args, **kwargs):
+        try:
+            return func(*args, **kwargs)
+        except Exception as e:
+            print(f"Error in {func.__name__}: {e}")
+            raise
+    return wrapper

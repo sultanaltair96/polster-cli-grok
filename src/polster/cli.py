@@ -299,6 +299,11 @@ def init(
     install_uv: bool = typer.Option(
         True, "--install-uv/--no-install-uv", help="Install uv if missing"
     ),
+    cicd_platform: str = typer.Option(
+        None,
+        "--cicd",
+        help="CI/CD platform to generate pipeline for (azure-devops, github-actions, gitlab-ci)",
+    ),
     dry_run: bool = typer.Option(
         False, "--dry-run", help="Show what would be created without creating"
     ),
@@ -394,6 +399,49 @@ load_from:
             rprint("[green]✓[/green] Initialized git repository")
         else:
             rprint("[yellow]⚠[/yellow] Git initialization failed")
+
+    # Handle CI/CD platform selection
+    selected_platform = cicd_platform
+    if cicd_platform is None and not dry_run:
+        rprint("\n[bold]CI/CD Pipeline Setup[/bold]")
+        rprint("Choose a CI/CD platform to generate an automated pipeline (optional):")
+        rprint("1. Azure DevOps")
+        rprint("2. GitHub Actions")
+        rprint("3. GitLab CI")
+        rprint("4. Skip CI/CD setup")
+
+        choice = Prompt.ask("Enter choice (1-4)", default="4")
+        platforms = {
+            "1": "azure-devops",
+            "2": "github-actions",
+            "3": "gitlab-ci",
+            "4": None,
+        }
+        selected_platform = platforms.get(choice)
+
+    if selected_platform:
+        cicd_template_dir = Path(__file__).parent / "templates" / "cicd"
+        template_file = None
+        dest_file = None
+
+        if selected_platform == "azure-devops":
+            template_file = cicd_template_dir / "azure-pipelines.yml"
+            dest_file = project_path / "azure-pipelines.yml"
+        elif selected_platform == "github-actions":
+            template_file = cicd_template_dir / "github-workflow.yml"
+            dest_file = project_path / ".github" / "workflows" / "polster.yml"
+        elif selected_platform == "gitlab-ci":
+            template_file = cicd_template_dir / "gitlab-ci.yml"
+            dest_file = project_path / ".gitlab-ci.yml"
+
+        if template_file and dest_file:
+            if dry_run:
+                rprint(f"Would create: {dest_file}")
+            elif template_file.exists():
+                copy_template_file(template_file, dest_file)
+                rprint(f"[green]✓[/green] Created {selected_platform} pipeline file")
+            else:
+                rprint(f"[yellow]⚠[/yellow] Template for {selected_platform} not found")
 
     # Handle uv installation
     do_install_uv = False
