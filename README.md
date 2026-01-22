@@ -45,7 +45,8 @@ Polster was inspired by the same philosophy that made dbt revolutionary: **makin
 - [Installation](#installation)
 - [Quick Start](#quick-start)
 - [Examples](#examples)
-- [Connectors](#connectors)
+- [Data Connectors](#data-connectors)
+- [CI/CD Integration](#cicd-integration)
 - [API Reference](#api-reference)
 - [Contributing](#contributing)
 - [License](#license)
@@ -77,6 +78,8 @@ It's like having a blueprint for your data house - you know where the foundation
 - **📊 Production Ready**: Includes monitoring, scheduling, and error handling
 - **🧪 Testable**: Each layer can be unit tested independently
 - **📚 Well Documented**: Clear examples and comprehensive guides
+- **🔌 Data Connectors**: Pre-built templates for MySQL, REST APIs, and SFTP
+- **🚀 CI/CD Ready**: Automated pipeline generation for major platforms
 
 ## Medallion Architecture
 
@@ -172,29 +175,35 @@ Let's create your first Polster project in 5 minutes:
    cd my_first_pipeline
    ```
 
-2. **Add a Bronze Asset** (raw data)
+2. **Add Data Connectors** (optional)
+   ```bash
+   cp docs/connectors/connectors.py.template src/core/connectors.py
+   # Edit connectors.py to add your data source credentials
+   ```
+
+3. **Add a Bronze Asset** (raw data)
    ```bash
    polster add-asset --layer bronze --name ingest_sales
    ```
 
-3. **Add a Silver Asset** (clean data)
+4. **Add a Silver Asset** (clean data)
    ```bash
    polster add-asset --layer silver --name clean_sales --dependencies ingest_sales
    ```
 
-4. **Add a Gold Asset** (business metrics)  
+5. **Add a Gold Asset** (business metrics)
    ```bash
    polster add-asset --layer gold --name sales_metrics --dependencies clean_sales
    ```
 
-5. **Run Your Pipeline**
+6. **Run Your Pipeline**
    ```bash
    python run_polster.py --ui
    ```
 
 That's it! You now have a complete data pipeline following best practices.
 
-## Connectors
+## Data Connectors
 
 Polster provides modular connector templates for common data sources, following a "batteries included" philosophy through extensible guides rather than bundled dependencies.
 
@@ -313,6 +322,88 @@ python run_polster.py --asset bronze_raw_orders
 # Check pipeline status
 python run_polster.py --status
 ```
+
+## CI/CD Integration
+
+Automate your data pipelines with one-command CI/CD setup for major platforms.
+
+### Supported Platforms
+
+Polster generates ready-to-use pipelines for:
+
+- **Azure DevOps**: `azure-pipelines.yml` with your proven automation logic
+- **GitHub Actions**: `.github/workflows/polster.yml` for seamless integration
+- **GitLab CI**: `.gitlab-ci.yml` for comprehensive pipeline control
+
+### Quick Setup
+
+Generate a project with automated CI/CD:
+
+```bash
+# Direct platform specification
+polster init my_project --cicd github-actions
+
+# Interactive selection
+polster init my_project  # Choose platform when prompted
+```
+
+### Pipeline Features
+
+Each generated pipeline includes:
+
+- **Scheduled Runs**: Daily automated data materialization (UTC midnight)
+- **Push Triggers**: Automatic runs on code changes to master/main
+- **Python Environment**: uv-based dependency management
+- **Data Persistence**: Commits generated data and artifacts back to repository
+- **Error Handling**: Robust failure management and logging
+
+### Example: Azure DevOps Pipeline
+
+The generated `azure-pipelines.yml` includes:
+
+```yaml
+# Trigger on master branch pushes and daily schedules
+trigger:
+  branches:
+    include:
+      - master
+
+schedules:
+- cron: "0 0 * * *"
+  displayName: Daily data materialization
+
+steps:
+- script: |
+    source .venv/bin/activate
+    python run_polster.py  # Your data pipeline
+- script: |
+    git add data/ .dagster/
+    git commit -m "Automated data materialization"
+    git push
+```
+
+### Advanced Configuration
+
+- **Environment Variables**: Secure credential storage via platform secrets
+- **Multi-Environment**: Configure dev/staging/prod deployments
+- **Custom Scheduling**: Modify cron expressions for different frequencies
+- **Parallel Jobs**: Split pipelines for large-scale processing
+
+### Platform-Specific Setup
+
+**Azure DevOps:**
+- Store secrets in Variable Groups or Key Vaults
+- Configure agent pools for your infrastructure
+
+**GitHub Actions:**
+- Use repository secrets for sensitive data
+- Leverage GitHub's free tiers for small projects
+
+**GitLab CI:**
+- Utilize CI/CD variables and protected environments
+- Integrate with GitLab's advanced pipeline features
+
+See the generated pipeline files for complete, working examples tailored to your chosen platform.
 
 ## API Reference
 
