@@ -392,7 +392,7 @@ polster init my_project  # Choose platform when prompted
 Each generated pipeline includes:
 
 - **Scheduled Runs**: Daily automated data materialization (UTC midnight)
-- **Push Triggers**: Automatic runs on code changes to master/main
+- **Push Triggers**: Automatic runs on code changes to main/master
 - **Python Environment**: uv-based dependency management
 - **Data Persistence**: Commits generated data and artifacts back to repository
 - **Error Handling**: Robust failure management and logging
@@ -402,11 +402,11 @@ Each generated pipeline includes:
 The generated `azure-pipelines.yml` includes:
 
 ```yaml
-# Trigger on master branch pushes and daily schedules
+# Trigger on main branch pushes and daily schedules
 trigger:
   branches:
     include:
-      - master
+      - main
 
 schedules:
 - cron: "0 0 * * *"
@@ -444,6 +444,36 @@ steps:
 - Integrate with GitLab's advanced pipeline features
 
 See the generated pipeline files for complete, working examples tailored to your chosen platform.
+
+### ⚠️ Important: Branch Configuration
+
+All generated CI/CD pipelines use **main** as the default branch name. 
+
+If your repository uses a different branch name (e.g., "master", "develop", etc.), you must update the branch references in your generated pipeline files:
+
+- **GitHub Actions**: Update `branches: - main` in `.github/workflows/polster.yml`
+- **GitLab CI**: Update `only: - main` in `.gitlab-ci.yml`  
+- **Azure DevOps**: Update `branches: include: - main` in `azure-pipelines.yml`
+
+This ensures your pipelines trigger correctly on code changes and scheduled runs.
+
+### 📁 Data Persistence Strategy
+
+Polster projects are configured to commit generated data and artifacts to your repository:
+
+- **`data/` folder**: Contains materialized datasets (CSV, Parquet files, etc.)
+- **`.dagster/` folder**: Contains Dagster run history and metadata
+
+These folders are **NOT** ignored by Git because:
+1. **Data Lineage**: Complete audit trail of data transformations
+2. **Team Collaboration**: All team members work with the same datasets
+3. **Reproducibility**: Pipeline results are versioned with code changes
+4. **CI/CD Integration**: Automated pipelines need to commit these artifacts
+
+If you need to exclude large files, consider:
+- Using Git LFS for large binary files
+- Adding file-specific ignores (e.g., `data/*.large`)
+- Implementing data archiving strategies
 
 ## API Reference
 

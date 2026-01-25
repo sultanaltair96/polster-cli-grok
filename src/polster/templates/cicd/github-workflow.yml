@@ -3,11 +3,11 @@
 
 name: Polster Data Pipeline
 
-# Trigger on push to master
+# Trigger on push to main
 on:
   push:
     branches:
-      - master
+      - main
 
   # Scheduled runs (UTC!)
   schedule:
@@ -28,13 +28,13 @@ jobs:
         fetch-depth: 0
         persist-credentials: true
 
-    # 1. FORCE latest master (critical for scheduled runs)
-    - name: Force latest master
+    # 1. FORCE latest main (critical for scheduled runs)
+    - name: Force latest main
       run: |
-        echo "Forcing workspace to latest origin/master"
-        git fetch origin master
-        git checkout master || git checkout -b master
-        git reset --hard origin/master
+        echo "Forcing workspace to latest origin/main"
+        git fetch origin main
+        git checkout main || git checkout -b main
+        git reset --hard origin/main
 
         echo "Running commit:"
         git log -1 --oneline
@@ -80,5 +80,5 @@ jobs:
           git commit -m "Automated commit from pipeline [skip ci]"
 
           # Force push to avoid merge conflicts
-          git push origin master --force
+          git push origin main --force
         fi

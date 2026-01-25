@@ -8,10 +8,10 @@ materialize:
   stage: materialize
   image: python:3.12
 
-  # Trigger on push to master and schedules
+  # Trigger on push to main and schedules
   # Note: Schedule this pipeline in GitLab UI with cron: "0 0 * * *"
   only:
-    - master
+    - main
     - schedules
 
   script:
@@ -19,11 +19,11 @@ materialize:
     - git config --global user.email "pipeline@gitlab-ci.local"
     - git config --global user.name "GitLab CI Pipeline"
 
-    # 1. FORCE latest master (critical for scheduled runs)
-    - echo "Forcing workspace to latest origin/master"
-    - git fetch origin master
-    - git checkout master || git checkout -b master
-    - git reset --hard origin/master
+    # 1. FORCE latest main (critical for scheduled runs)
+    - echo "Forcing workspace to latest origin/main"
+    - git fetch origin main
+    - git checkout main || git checkout -b main
+    - git reset --hard origin/main
     - echo "Running commit:"
     - git log -1 --oneline
 
@@ -50,7 +50,7 @@ materialize:
         echo "No changes to commit"
       else
         git commit -m "Automated commit from pipeline [skip ci]"
-        git push origin master
+        git push origin main
       fi
 
   # Cache dependencies
