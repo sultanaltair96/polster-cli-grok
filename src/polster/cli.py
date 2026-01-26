@@ -15,6 +15,28 @@ from rich.prompt import Confirm, Prompt
 app = typer.Typer(help="Polster CLI - Generate data orchestration projects and assets")
 
 
+def version_callback(value: bool):
+    """Handle --version flag."""
+    if value:
+        from polster import __version__
+        typer.echo(f"polster {__version__}")
+        raise typer.Exit()
+
+
+@app.callback()
+def main(
+    version: bool = typer.Option(
+        False, 
+        "--version", 
+        callback=version_callback, 
+        is_eager=True,
+        help="Show version and exit"
+    )
+):
+    """Polster CLI - Generate data orchestration projects and assets"""
+    pass
+
+
 def validate_project_name(name: str) -> str:
     """Validate project name format."""
     if not re.match(r"^[a-zA-Z][a-zA-Z0-9_-]*$", name):
