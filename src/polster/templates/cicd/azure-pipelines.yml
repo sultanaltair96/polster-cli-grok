@@ -1,11 +1,11 @@
 # Polster CI/CD Pipeline for Azure DevOps
 # This pipeline automates data materialization and commits changes back to the repository
 
-# Trigger on push to master
+# Trigger on push to main
 trigger:
   branches:
     include:
-      - master
+      - main
 
 # Scheduled runs (UTC!)
 schedules:
@@ -13,7 +13,7 @@ schedules:
   displayName: Asset materialization daily at midnight UTC
   branches:
     include:
-      - master
+      - main
   always: true
 
 pool:
@@ -28,12 +28,12 @@ steps:
   persistCredentials: true
   fetchDepth: 0
 
-# 1. FORCE latest master (critical for scheduled runs)
+# 1. FORCE latest main (critical for scheduled runs)
 - script: |
-    echo "Forcing workspace to latest origin/master"
-    git fetch origin master
-    git checkout master || git checkout -b master
-    git reset --hard origin/master
+    echo "Forcing workspace to latest origin/main"
+    git fetch origin main
+    git checkout main || git checkout -b main
+    git reset --hard origin/main
 
     echo "Running commit:"
     git log -1 --oneline
@@ -79,12 +79,12 @@ steps:
       git commit -m "Automated commit from pipeline [skip ci]"
 
       # Rebase-safe pull, fallback to merge
-      git pull --rebase origin master || {
+      git pull --rebase origin main || {
         echo "Rebase failed, falling back to merge"
         git rebase --abort
-        git pull origin master --no-rebase
+        git pull origin main --no-rebase
       }
 
-      git push origin master
+      git push origin main
     fi
   displayName: 'Commit and push changes'

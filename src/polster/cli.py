@@ -15,6 +15,28 @@ from rich.prompt import Confirm, Prompt
 app = typer.Typer(help="Polster CLI - Generate data orchestration projects and assets")
 
 
+def version_callback(value: bool):
+    """Handle --version flag."""
+    if value:
+        from polster import __version__
+        typer.echo(f"polster {__version__}")
+        raise typer.Exit()
+
+
+@app.callback()
+def main(
+    version: bool = typer.Option(
+        False, 
+        "--version", 
+        callback=version_callback, 
+        is_eager=True,
+        help="Show version and exit"
+    )
+):
+    """Polster CLI - Generate data orchestration projects and assets"""
+    pass
+
+
 def validate_project_name(name: str) -> str:
     """Validate project name format."""
     if not re.match(r"^[a-zA-Z][a-zA-Z0-9_-]*$", name):
@@ -44,10 +66,10 @@ def copy_template_file(
         shutil.copy2(src, dest)
         return
 
-    content = src.read_text()
+    content = src.read_text(encoding='utf-8')
     for key, value in replacements.items():
         content = content.replace(key, value)
-    dest.write_text(content)
+    dest.write_text(content, encoding='utf-8')
 
 
 def ensure_polster_project() -> Path:
@@ -235,8 +257,8 @@ def _start_dagster_ui(project_path: Path) -> None:
     """Start Dagster UI in the project directory."""
     port = _find_available_port(3000)
 
-    rprint(f"[green]✓[/green] Starting Dagster UI on port {port}...")
-    rprint(f"[blue]🚀[/blue] Dagster UI will be available at: http://localhost:{port}")
+    rprint(f"[green][OK][/green] Starting Dagster UI on port {port}...")
+    rprint(f"[blue][START][/blue] Dagster UI will be available at: http://localhost:{port}")
     rprint("[dim]Press Ctrl+C to stop...[/dim]")
     rprint()
 
@@ -276,7 +298,7 @@ def _start_dagster_ui(project_path: Path) -> None:
 
         subprocess.run(cmd)
     except KeyboardInterrupt:
-        rprint("[yellow]⚠[/yellow] Dagster UI stopped")
+        rprint("[yellow][WARN][/yellow] Dagster UI stopped")
     except Exception as e:
         rprint(f"[red]❌ Failed to start Dagster: {e}[/red]")
         rprint("[dim]You can start it manually with:[/dim]")
@@ -359,7 +381,7 @@ def init(
     if dry_run:
         rprint("[bold]Dry run - would create:[/bold]")
     else:
-        rprint("[green]✓[/green] Created directory and copied template files")
+        rprint("[green][OK][/green] Created directory and copied template files")
 
     copy_tree(template_dir, project_path)
 
@@ -374,7 +396,7 @@ load_from:
         rprint(f"Would create: {workspace_file}")
     else:
         workspace_file.write_text(workspace_content)
-        rprint("[green]✓[/green] Created workspace.yaml for Dagster")
+        rprint("[green][OK][/green] Created workspace.yaml for Dagster")
 
     if not sample_assets and not dry_run:
         # Remove sample assets if not requested
@@ -382,7 +404,7 @@ load_from:
             asset_file.unlink()
         for asset_file in project_path.glob("src/orchestration/assets/*/*_example.py"):
             asset_file.unlink()
-        rprint("[green]✓[/green] Removed sample assets as requested")
+        rprint("[green][OK][/green] Removed sample assets as requested")
 
     # Handle git initialization
     init_git = False
@@ -396,9 +418,9 @@ load_from:
 
     if init_git and not dry_run:
         if run_command(["git", "init"], cwd=project_path):
-            rprint("[green]✓[/green] Initialized git repository")
+            rprint("[green][OK][/green] Initialized git repository")
         else:
-            rprint("[yellow]⚠[/yellow] Git initialization failed")
+            rprint("[yellow][WARN][/yellow] Git initialization failed")
 
     # Handle CI/CD platform selection
     selected_platform = cicd_platform
@@ -439,9 +461,9 @@ load_from:
                 rprint(f"Would create: {dest_file}")
             elif template_file.exists():
                 copy_template_file(template_file, dest_file)
-                rprint(f"[green]✓[/green] Created {selected_platform} pipeline file")
+                rprint(f"[green][OK][/green] Created {selected_platform} pipeline file")
             else:
-                rprint(f"[yellow]⚠[/yellow] Template for {selected_platform} not found")
+                rprint(f"[yellow][WARN][/yellow] Template for {selected_platform} not found")
 
     # Handle uv installation
     do_install_uv = False
@@ -452,7 +474,7 @@ load_from:
         rprint("Installing uv...")
         # Install uv using the official installer
         if run_command(["sh", "-c", "curl -LsSf https://astral.sh/uv/install.sh | sh"]):
-            rprint("[green]✓[/green] Installed uv")
+            rprint("[green][OK][/green] Installed uv")
             # Need to update PATH for subprocess to see uv
             os.environ["PATH"] = os.path.expanduser("~/.cargo/bin:") + os.environ.get(
                 "PATH", ""
@@ -470,7 +492,7 @@ load_from:
                         )
                         break
         else:
-            rprint("[yellow]⚠[/yellow] uv installation failed")
+            rprint("[yellow][WARN][/yellow] uv installation failed")
 
     # Create virtual environment and install dependencies
     if not dry_run:
@@ -478,23 +500,23 @@ load_from:
         if shutil.which("uv"):
             # Use uv
             if run_command(["uv", "venv"], cwd=project_path):
-                rprint("[green]✓[/green] Created virtual environment with uv")
+                rprint("[green][OK][/green] Created virtual environment with uv")
 
                 # Try uv sync first, then fall back to uv pip install
                 if run_command(["uv", "sync", "--extra", "dev"], cwd=project_path):
-                    rprint("[green]✓[/green] Installed dependencies with uv sync")
+                    rprint("[green][OK][/green] Installed dependencies with uv sync")
                 elif run_command(
                     ["uv", "pip", "install", "-e", ".[dev]"], cwd=project_path
                 ):
-                    rprint("[green]✓[/green] Installed dependencies with uv pip")
+                    rprint("[green][OK][/green] Installed dependencies with uv pip")
                 else:
-                    rprint("[yellow]⚠[/yellow] Failed to install dependencies with uv")
+                    rprint("[yellow][WARN][/yellow] Failed to install dependencies with uv")
             else:
-                rprint("[yellow]⚠[/yellow] Failed to create virtual environment")
+                rprint("[yellow][WARN][/yellow] Failed to create virtual environment")
         else:
             # Fallback to python -m venv
             if run_command([sys.executable, "-m", "venv", ".venv"], cwd=project_path):
-                rprint("[green]✓[/green] Created virtual environment")
+                rprint("[green][OK][/green] Created virtual environment")
 
                 # Install dependencies
                 pip_cmd = (
@@ -503,16 +525,16 @@ load_from:
                     else [".venv\\Scripts\\pip.exe"]
                 )
                 if run_command(pip_cmd + ["install", "-e", ".[dev]"], cwd=project_path):
-                    rprint("[green]✓[/green] Installed dependencies")
+                    rprint("[green][OK][/green] Installed dependencies")
                 else:
-                    rprint("[yellow]⚠[/yellow] Failed to install dependencies")
+                    rprint("[yellow][WARN][/yellow] Failed to install dependencies")
             else:
-                rprint("[yellow]⚠[/yellow] Failed to create virtual environment")
+                rprint("[yellow][WARN][/yellow] Failed to create virtual environment")
 
     # Final instructions
     if not dry_run:
         rprint("\n[bold green]✓ Project created successfully![/bold green]")
-        rprint(f"📁 Location: ../{project_name}")
+        rprint(f"[DIR] Location: ../{project_name}")
 
         # Check if virtual environment exists and provide commands
         venv_path = project_path / ".venv"
@@ -524,15 +546,15 @@ load_from:
             else:
                 activation_cmd = ".venv/bin/activate"
 
-            rprint("\n🚀 Quick start (copy & paste):")
+            rprint("\n[START] Quick start (copy & paste):")
             rprint(
                 f"  cd ../{project_name} && source {activation_cmd} && python run_polster.py --ui"
             )
-            rprint("\n🚀 Recommended workflow:")
+            rprint("\n[START] Recommended workflow:")
             rprint(f"  cd ../{project_name}")
             rprint(f"  source {activation_cmd}")
             rprint("  python run_polster.py --ui  # Materialize + launch UI")
-            rprint("\n📝 Alternative options:")
+            rprint("\n[NOTE] Alternative options:")
             rprint("  python run_polster.py        # Materialize only")
             rprint("  python run_polster.py --no-materialize --ui  # Launch UI only")
         else:
@@ -720,11 +742,11 @@ def add_asset(
                     break
 
         init_file.write_text(content)
-        rprint(f"[green]✓[/green] Updated: {init_file.relative_to(project_path)}")
+        rprint(f"[green][OK][/green] Updated: {init_file.relative_to(project_path)}")
 
-    rprint(f"[green]✓[/green] Created core file: {core_file.relative_to(project_path)}")
+    rprint(f"[green][OK][/green] Created core file: {core_file.relative_to(project_path)}")
     rprint(
-        f"[green]✓[/green] Created orchestration file: {orch_file.relative_to(project_path)}"
+        f"[green][OK][/green] Created orchestration file: {orch_file.relative_to(project_path)}"
     )
 
     rprint("\n[bold]Next steps:[/bold]")
@@ -852,7 +874,7 @@ def remove_asset(
         # Block if there are dependencies
         if all_dependent_assets:
             rprint(
-                f"\n[red]⚠️  Cannot remove: {len(all_dependent_assets)} asset(s) depend on selected asset(s):[/red]"
+                f"\n[red][WARN]  Cannot remove: {len(all_dependent_assets)} asset(s) depend on selected asset(s):[/red]"
             )
             for dep in all_dependent_assets:
                 rprint(f"  - {dep}")
@@ -885,7 +907,7 @@ def remove_asset(
         try:
             file_path.unlink()
             removed_count += 1
-            rprint(f"✅ Removed {file_path.relative_to(project_path)}")
+            rprint(f"[REMOVED] {file_path.relative_to(project_path)}")
         except Exception as e:
             rprint(
                 f"[red]Failed to remove {file_path.relative_to(project_path)}: {e}[/red]"
@@ -900,6 +922,64 @@ def remove_asset(
         )
     else:
         rprint("[yellow]No files were removed[/yellow]")
+
+
+@app.command()
+def setup(
+    force: bool = typer.Option(False, "--force", help="Force recreation of virtual environment"),
+) -> None:
+    """Set up or recreate the virtual environment for this project."""
+    try:
+        project_root = Path.cwd()
+
+        # Find project root if not already there
+        if not (project_root / "pyproject.toml").exists():
+            # Try to find it by going up directories
+            for parent in [project_root] + list(project_root.parents):
+                if (parent / "pyproject.toml").exists() and (parent / "src" / "polster").exists():
+                    project_root = parent
+                    break
+            else:
+                rprint("[red]Error: Could not find polster project root[/red]")
+                rprint("Make sure you're in a polster project directory or subdirectory.")
+                raise typer.Exit(1)
+
+        venv_path = project_root / ".venv"
+
+        # Check if venv already exists
+        if venv_path.exists() and not force:
+            rprint(f"[yellow]Virtual environment already exists at {venv_path}[/yellow]")
+            rprint("Use --force to recreate it.")
+            return
+
+        # Remove existing venv if force is used
+        if venv_path.exists() and force:
+            rprint("[yellow]Removing existing virtual environment...[/yellow]")
+            shutil.rmtree(venv_path)
+
+        # Create new venv
+        rprint(f"[OK] Creating virtual environment in {venv_path}")
+        subprocess.run([sys.executable, "-m", "venv", str(venv_path)], check=True)
+
+        # Install package in venv
+        if os.name == "nt":  # Windows
+            pip_path = venv_path / "Scripts" / "pip.exe"
+        else:  # Unix
+            pip_path = venv_path / "bin" / "pip"
+
+        rprint("[OK] Installing polster in virtual environment...")
+        subprocess.run([str(pip_path), "install", "-e", str(project_root)], check=True)
+
+        rprint("[green]Virtual environment setup complete![/green]")
+        rprint(f"[DIR] Location: {venv_path}")
+        rprint("\n[START] You can now use polster commands seamlessly!")
+
+    except subprocess.CalledProcessError as e:
+        rprint(f"[red]Error during setup: {e}[/red]")
+        raise typer.Exit(1) from None
+    except Exception as e:
+        rprint(f"[red]Unexpected error: {e}[/red]")
+        raise typer.Exit(1) from None
 
 
 if __name__ == "__main__":

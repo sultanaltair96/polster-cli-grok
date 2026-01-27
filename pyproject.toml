@@ -34,7 +34,7 @@ dev = [
 ]
 
 [project.scripts]
-polster = "polster.cli:app"
+polster = "polster.launcher:main"
 
 [project.urls]
 Homepage = "https://github.com/polster/polster-cli"

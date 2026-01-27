@@ -3,7 +3,7 @@
 [![PyPI version](https://badge.fury.io/py/polster.svg)](https://pypi.org/project/polster/)
 [![Python 3.12+](https://img.shields.io/badge/python-3.12+-blue.svg)](https://www.python.org/downloads/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![CI](https://github.com/sultanaltair96/polster-cli-grok/actions/workflows/ci.yml/badge.svg)](https://github.com/sultanaltair96/polster-cli-grok/actions)
+[![CI](https://github.com/sultanaltair96/polster-cli/actions/workflows/ci.yml/badge.svg)](https://github.com/sultanaltair96/polster-cli/actions)
 
 **Build reliable data pipelines with enforced Medallion Architecture**
 
@@ -153,8 +153,48 @@ pip install polster
 
 ### Install from Source (Development)
 ```bash
-git clone https://github.com/sultanaltair96/polster-cli-grok
-cd polster-cli-grok
+git clone https://github.com/sultanaltair96/polster-cli
+cd polster-cli
+pip install -e ".[dev]"
+```
+
+**Note:** You may see a warning about the script not being on PATH. This is normal and can be ignored - Polster's automatic virtual environment system works regardless of your PATH configuration.
+
+**To use polster commands immediately after installation:**
+```bash
+# Use the full path to the script
+"C:\Users\%USERNAME%\AppData\Roaming\Python\Python314\Scripts\polster.exe" --help
+
+# Or add the Scripts directory to your PATH (optional)
+# Windows PowerShell:
+$env:PATH += ";C:\Users\$env:USERNAME\AppData\Roaming\Python\Python314\Scripts"
+
+# Windows Command Prompt:
+set PATH=%PATH%;C:\Users\%USERNAME%\AppData\Roaming\Python\Python314\Scripts
+```
+
+#### Windows Installation Notes
+If you're using PowerShell on Windows and encounter path issues with directories containing spaces:
+
+**Always use quotes around paths:**
+```powershell
+# Instead of:
+cd C:\Users\tanis\Desktop\Personal Projects\polster testing
+git clone https://github.com/sultanaltair96/polster-cli
+cd polster-cli
+
+# Use quotes:
+cd "C:\Users\tanis\Desktop\Personal Projects\polster testing"
+git clone https://github.com/sultanaltair96/polster-cli
+cd "polster-cli"
+```
+
+**Alternative: Use Command Prompt**
+PowerShell sometimes has issues with spaces in paths. You can also use Command Prompt:
+```cmd
+cd C:\Users\tanis\Desktop\Personal Projects\polster testing
+git clone https://github.com/sultanaltair96/polster-cli
+cd polster-cli
 pip install -e ".[dev]"
 ```
 
@@ -352,7 +392,7 @@ polster init my_project  # Choose platform when prompted
 Each generated pipeline includes:
 
 - **Scheduled Runs**: Daily automated data materialization (UTC midnight)
-- **Push Triggers**: Automatic runs on code changes to master/main
+- **Push Triggers**: Automatic runs on code changes to main/master
 - **Python Environment**: uv-based dependency management
 - **Data Persistence**: Commits generated data and artifacts back to repository
 - **Error Handling**: Robust failure management and logging
@@ -362,11 +402,11 @@ Each generated pipeline includes:
 The generated `azure-pipelines.yml` includes:
 
 ```yaml
-# Trigger on master branch pushes and daily schedules
+# Trigger on main branch pushes and daily schedules
 trigger:
   branches:
     include:
-      - master
+      - main
 
 schedules:
 - cron: "0 0 * * *"
@@ -404,6 +444,36 @@ steps:
 - Integrate with GitLab's advanced pipeline features
 
 See the generated pipeline files for complete, working examples tailored to your chosen platform.
+
+### ⚠️ Important: Branch Configuration
+
+All generated CI/CD pipelines use **main** as the default branch name. 
+
+If your repository uses a different branch name (e.g., "master", "develop", etc.), you must update the branch references in your generated pipeline files:
+
+- **GitHub Actions**: Update `branches: - main` in `.github/workflows/polster.yml`
+- **GitLab CI**: Update `only: - main` in `.gitlab-ci.yml`  
+- **Azure DevOps**: Update `branches: include: - main` in `azure-pipelines.yml`
+
+This ensures your pipelines trigger correctly on code changes and scheduled runs.
+
+### 📁 Data Persistence Strategy
+
+Polster projects are configured to commit generated data and artifacts to your repository:
+
+- **`data/` folder**: Contains materialized datasets (CSV, Parquet files, etc.)
+- **`.dagster/` folder**: Contains Dagster run history and metadata
+
+These folders are **NOT** ignored by Git because:
+1. **Data Lineage**: Complete audit trail of data transformations
+2. **Team Collaboration**: All team members work with the same datasets
+3. **Reproducibility**: Pipeline results are versioned with code changes
+4. **CI/CD Integration**: Automated pipelines need to commit these artifacts
+
+If you need to exclude large files, consider:
+- Using Git LFS for large binary files
+- Adding file-specific ignores (e.g., `data/*.large`)
+- Implementing data archiving strategies
 
 ## API Reference
 
@@ -529,10 +599,13 @@ We welcome contributions! Polster is built by the community for the community.
 
 ### Development Setup
 ```bash
-git clone https://github.com/sultanaltair96/polster-cli-grok
-cd polster-cli-grok
+git clone https://github.com/sultanaltair96/polster-cli
+cd polster-cli
 pip install -e ".[dev]"
 ```
+
+**Windows Development Notes:**
+If you encounter PowerShell path issues with spaces in directory names, refer to the [Windows Installation Notes](#windows-installation-notes) above.
 
 ### Running Tests
 ```bash

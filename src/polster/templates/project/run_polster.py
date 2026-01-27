@@ -34,7 +34,7 @@ def build_env(root: pathlib.Path) -> dict[str, str]:
 
     pythonpath = str(root / "src")
     if "PYTHONPATH" in env:
-        env["PYTHONPATH"] = pythonpath + ":" + env["PYTHONPATH"]
+        env["PYTHONPATH"] = pythonpath + os.pathsep + env["PYTHONPATH"]
     else:
         env["PYTHONPATH"] = pythonpath
 
@@ -43,7 +43,7 @@ def build_env(root: pathlib.Path) -> dict[str, str]:
 
 def materialize_assets(root: pathlib.Path, env: dict[str, str]) -> bool:
     """Materialize all assets and return success status."""
-    print("🚀 Materializing all assets...")
+    print("[START] Materializing all assets...")
     cmd = [
         "dagster",
         "asset",
@@ -55,16 +55,16 @@ def materialize_assets(root: pathlib.Path, env: dict[str, str]) -> bool:
     ]
     result = subprocess.call(cmd, cwd=root, env=env)
     if result == 0:
-        print("✅ Assets materialized successfully!")
+        print("[OK] Assets materialized successfully!")
         return True
     else:
-        print("❌ Asset materialization failed!")
+        print("[ERROR] Asset materialization failed!")
         return False
 
 
 def launch_ui(root: pathlib.Path, env: dict[str, str]):
     """Launch the Dagster development UI."""
-    print("🌐 Launching Dagster UI...")
+    print("[WEB] Launching Dagster UI...")
     print("   Open http://127.0.0.1:3000 in your browser")
     print("   Press Ctrl+C to stop the server")
     try:

@@ -142,8 +142,6 @@ Thumbs.db
 # Local testing
 test_projects/
 
-# Dagster
-.dagster/
-
-# Local data
-data/
+# Note: data/ and .dagster/ folders are intentionally not ignored
+# This allows generated data and Dagster artifacts to be committed
+# for version control and CI/CD pipeline functionality
