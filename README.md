@@ -69,6 +69,38 @@ Polster solves this by enforcing the Medallion Architecture - a proven pattern t
 
 It's like having a blueprint for your data house - you know where the foundation, walls, and roof go before you start building.
 
+## What Makes Polster Unique
+
+While there are hundreds of repositories implementing Medallion Architecture on GitHub, **Polster is the only CLI tool that generates AND enforces Medallion Architecture scaffolding**. Most repos are examples, tutorials, or platform-specific implementations. Polster is different:
+
+### 🎯 Solves the Real Problem
+The Medallion Architecture pattern is proven and widely adopted, but implementing it consistently across teams is challenging. Polster enforces this architecture at the scaffolding level, ensuring every project starts with proper structure from day one.
+
+### ⚡ Exceptional Developer Experience
+The `polster init` → `polster add-asset` workflow eliminates setup friction. Interactive prompts for dependencies prevent architecture violations before they happen, guiding developers toward best practices naturally.
+
+### 🛠️ Smart Technology Stack
+Built on modern, high-performance tools chosen specifically for data engineering:
+- **Dagster** for intelligent pipeline orchestration and asset modeling
+- **Polars** for blazing-fast data processing (10-100x faster than pandas)
+- **Python-native** ecosystem with full library access (ML, APIs, complex logic)
+
+### 🚀 Production-Ready Out of the Box
+Unlike project templates that require manual CI/CD setup, Polster auto-generates pipelines for:
+- GitHub Actions
+- Azure DevOps  
+- GitLab CI
+
+Including scheduled runs, automated data persistence, and error handling.
+
+### 🔌 Flexible Connector Architecture
+"Batteries included but extensible" approach means:
+- Pre-built templates for MySQL, REST APIs, and SFTP
+- No forced dependencies—install only what you need
+- Easy to customize for your specific requirements
+
+**No other tool on GitHub combines CLI scaffolding, Medallion Architecture enforcement, and production-ready CI/CD like Polster.**
+
 ## Key Features
 
 - **🛡️ Enforced Architecture**: Automatically creates Bronze → Silver → Gold layers with proper dependencies
